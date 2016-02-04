@@ -1,0 +1,30 @@
+Electric  
+Usage:77  Days:1  Baseline:10  MedAllowance:2
+Status: Regular   Zone: 1   Season: S  Service: 2
+PrevDate: 1/19/2016   CurrDate: 1/19/2016   PrevRead: 1676   CurrRead: 1599
+
+Tier1: 10x6E-05=$0.00
+Tier2: 3x7E-05=$0.00
+Tier3: 7x8E-05=$0.00
+Tier4: 10x9E-05=$0.00
+Tier5: 47x1E-05=$0.00
+
+Delivery Total:              $0.00
+
+Tier1: 10x0.03458=$0.35
+Tier2: 3x0.02548=$0.08
+Tier3: 7x0.04529=$0.32
+Tier4: 10x0.2541=$2.54
+Tier5: 47x0.02505=$1.18
+
+Generation Total:            $4.46
+
+Walt Money: 44
+Fast Pass: 77x1=$77.00
+Entry: 152
+
+Surcharge Total:            $273.00
+
+StateTax: 77x0.00029=$0.02
+
+Total:$277.48

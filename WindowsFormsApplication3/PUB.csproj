@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B93E6E64-F54E-4CCA-8B83-2225DB246DD5}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PUB</RootNamespace>
+    <AssemblyName>WindowsFormsApplication3</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.VisualBasic.PowerPacks.Vs, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PdfSharp">
+      <HintPath>..\..\YLHR\YL\PDFsharp\code\PdfSharp\bin\Debug\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PdfControl.cs" />
+    <Compile Include="ReadHistory.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ReadHistory.Designer.cs">
+      <DependentUpon>ReadHistory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CommonTools.cs" />
+    <Compile Include="DatabaseControl.cs" />
+    <Compile Include="ImportMeterReadFile.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImportMeterReadFile.Designer.cs">
+      <DependentUpon>ImportMeterReadFile.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MeterReads.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MeterReads.Designer.cs">
+      <DependentUpon>MeterReads.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MoveOut.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MoveOut.Designer.cs">
+      <DependentUpon>MoveOut.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OwnerInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OwnerInfo.Designer.cs">
+      <DependentUpon>OwnerInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainMenu.Designer.cs">
+      <DependentUpon>MainMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ParkBilling.cs" />
+    <Compile Include="ParkInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ParkInfo.Designer.cs">
+      <DependentUpon>ParkInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Setup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Setup.Designer.cs">
+      <DependentUpon>Setup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ParkSpaceInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ParkSpaceInfo.Designer.cs">
+      <DependentUpon>ParkSpaceInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TenantBill.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TenantBill.Designer.cs">
+      <DependentUpon>TenantBill.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TenantInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TenantInfo.Designer.cs">
+      <DependentUpon>TenantInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TierInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TierInfo.Designer.cs">
+      <DependentUpon>TierInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UserSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UserSettings.Designer.cs">
+      <DependentUpon>UserSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UtilityElectricity0.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UtilityElectricity0.Designer.cs">
+      <DependentUpon>UtilityElectricity0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UtilityElectricity1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UtilityElectricity1.Designer.cs">
+      <DependentUpon>UtilityElectricity1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UtilityGas0.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UtilityGas0.Designer.cs">
+      <DependentUpon>UtilityGas0.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UtilityGas1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UtilityGas1.Designer.cs">
+      <DependentUpon>UtilityGas1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UtilityWater.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UtilityWater.Designer.cs">
+      <DependentUpon>UtilityWater.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="ImportMeterReadFile.resx">
+      <DependentUpon>ImportMeterReadFile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MeterReads.resx">
+      <DependentUpon>MeterReads.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MoveOut.resx">
+      <DependentUpon>MoveOut.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OwnerInfo.resx">
+      <DependentUpon>OwnerInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainMenu.resx">
+      <DependentUpon>MainMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ParkInfo.resx">
+      <DependentUpon>ParkInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="ReadHistory.resx">
+      <DependentUpon>ReadHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setup.resx">
+      <DependentUpon>Setup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ParkSpaceInfo.resx">
+      <DependentUpon>ParkSpaceInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TenantBill.resx">
+      <DependentUpon>TenantBill.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TenantInfo.resx">
+      <DependentUpon>TenantInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TierInfo.resx">
+      <DependentUpon>TierInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UserSettings.resx">
+      <DependentUpon>UserSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UtilityElectricity0.resx">
+      <DependentUpon>UtilityElectricity0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UtilityElectricity1.resx">
+      <DependentUpon>UtilityElectricity1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UtilityGas0.resx">
+      <DependentUpon>UtilityGas0.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UtilityGas1.resx">
+      <DependentUpon>UtilityGas1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UtilityWater.resx">
+      <DependentUpon>UtilityWater.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
