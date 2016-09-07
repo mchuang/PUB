@@ -16,7 +16,8 @@ namespace PUB
     {
         int parkID, parkSpaceID;
         string spaceID;
-        ArrayList newReads, oldReads;
+        List<CommonTools.Read> newReads;
+        List<Object[]> oldReads;
         private int readIndex;
 
         public MeterReads()
@@ -32,15 +33,14 @@ namespace PUB
             eleValue.Enabled = false;
             watValue.Enabled = false;
             readDate.Enabled = false;
-            
+            prevReadDate.Enabled = false;
         }
-
+        
         private void parkNumber_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.parkID = ((CommonTools.Item)parkList.SelectedItem).Value;
             spaceList.Items.Clear();
-            DatabaseControl.populateComboBox(ref spaceList, DatabaseControl.spaceTable, "ParkSpaceID", "SpaceID", "Tenant",
-                "ParkID=@value0 ORDER BY SpaceID ASC", new Object[] {this.parkID});
+            DatabaseControl.populateComboBox(ref spaceList, DatabaseControl.spaceTable, "SpaceID", "Tenant", "ParkSpaceID", "ParkID=@value0 ORDER BY SpaceID ASC", new Object[] { this.parkID });
             spaceList.Enabled = true;
         }
 
@@ -57,18 +57,18 @@ namespace PUB
             this.parkSpaceID = ((CommonTools.Item)spaceList.SelectedItem).Value;
             this.spaceID = DatabaseControl.getSingleRecord(new String[] { "SpaceID" }, DatabaseControl.spaceTable,
             "ParkSpaceID=@value0", new Object[] { this.parkSpaceID })[0].ToString();
-            newReads = new ArrayList();
+            newReads = new List<CommonTools.Read>();
             loadMeterReads();
             gasValue.Enabled = true;
             eleValue.Enabled = true;
             watValue.Enabled = true;
             readDate.Enabled = true;
-           
+            prevReadDate.Enabled = true;          
         }
 
         private void loadMeterReads()
         {
-            oldReads = DatabaseControl.getMultipleRecord(new String[] { "MeterReadID", "ParkID", "SpaceID", "MeterReadDate", "GasReadValue",  "EleReadValue",  "WatReadValue" }, DatabaseControl.meterReadsTable,
+            oldReads = DatabaseControl.getMultipleRecord(new String[] { "MeterReadID", "ParkID", "SpaceID", "MeterReadDate", "GasReadValue",  "EleReadValue",  "WatReadValue","StartDate" }, DatabaseControl.meterReadsTable,
             "ParkID=@value0 and SpaceID=@value1", new Object[] {this.parkID, this.spaceID });
             readIndex = oldReads.Count - 1;
             displayRead();
@@ -85,14 +85,15 @@ namespace PUB
                 gasValue.Value = (int)read[4];
                 eleValue.Value = (int)read[5];
                 watValue.Value = (int)read[6];
-                
+                prevReadDate.Value = (DateTime)read[7];
             }
             else
             {
                 readDate.Value = DateTime.Today.Date;
                 gasValue.Value = 0; 
                 eleValue.Value = 0; 
-                watValue.Value = 0; 
+                watValue.Value = 0;
+                prevReadDate.Value = DateTime.Today.Date;
             }
         }
 
@@ -100,13 +101,13 @@ namespace PUB
         {
             if (readIndex >= oldReads.Count)
             {
-                newReads.Add(new CommonTools.Read((int)parkID, (string)spaceID, (DateTime)readDate.Value, (int)gasValue.Value, (int)eleValue.Value, (int)watValue.Value));
+                newReads.Add(new CommonTools.Read((int)parkID, (string)spaceID, (DateTime)readDate.Value, (int)gasValue.Value, (int)eleValue.Value, (int)watValue.Value, (DateTime)prevReadDate.Value));
             }
             else
             {
                 Object[] read = (Object[])oldReads[readIndex];
                 int readId = (int)read[0];
-                newReads.Add(new CommonTools.Read((int)parkID, (string)spaceID, (DateTime)readDate.Value, (int)gasValue.Value, (int)eleValue.Value, (int)watValue.Value, readId));
+                newReads.Add(new CommonTools.Read((int)parkID, (string)spaceID, (DateTime)readDate.Value, (int)gasValue.Value, (int)eleValue.Value, (int)watValue.Value, (DateTime)prevReadDate.Value, readId));
             }
         }
 
@@ -136,16 +137,16 @@ namespace PUB
             {
                 if (read.readId == -1)
                 {
-                    DatabaseControl.executeInsertQuery(DatabaseControl.meterReadsTable, new String[] { "ParkID", "SpaceID", "MeterReadDate", "GasReadValue", "EleReadValue", "WatReadValue" },
-                        new Object[] { read.parkID, read.spaceID, read.readDate, read.gasValue, read.eleValue,  read.watValue });
+                    DatabaseControl.executeInsertQuery(DatabaseControl.meterReadsTable, new String[] { "ParkID", "SpaceID", "MeterReadDate", "GasReadValue", "EleReadValue", "WatReadValue", "StartDate" },
+                        new Object[] { read.parkID, read.spaceID, read.readDate, read.gasValue, read.eleValue,  read.watValue, read.prevReadDate});
                 }
                 else
                 {
-                    DatabaseControl.executeUpdateQuery(DatabaseControl.meterReadsTable, new String[] { "MeterReadDate", "GasReadValue", "EleReadValue",  "WatReadValue" },
-                        new Object[] {read.readDate, read.gasValue, read.eleValue,  read.watValue }, "MeterReadId=" + read.readId);
+                    DatabaseControl.executeUpdateQuery(DatabaseControl.meterReadsTable, new String[] { "MeterReadDate", "GasReadValue", "EleReadValue", "WatReadValue", "StartDate" },
+                        new Object[] { read.readDate, read.gasValue, read.eleValue, read.watValue, read.prevReadDate }, "MeterReadId=" + read.readId);
                 }
             }
-            newReads = new ArrayList();
+            newReads = new List<CommonTools.Read>();
             MessageBox.Show("Data saved");
         }
 

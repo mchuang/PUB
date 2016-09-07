@@ -12,24 +12,20 @@ namespace PUB
 {
     public partial class UtilityGas1 : Form
     {
-        public decimal[][] summerAllowance, winterAllowance;
+        public decimal[][] allowanceRates;
         public decimal medicalAllowance;
         public bool committed = false;
 
-        public UtilityGas1(ref decimal[][] summer, ref decimal[][] winter, ref decimal medical)
+        public UtilityGas1(decimal[][] allowance, decimal medical)
         {
             InitializeComponent();
-            summerAllowance = summer;
-            winterAllowance = winter;
-            medicalAllowance = medical;
+            this.allowanceRates = allowance;
+            this.medicalAllowance = medical;
         }
 
         private void UtilityGas1_Load(object sender, EventArgs e)
         {
-            seasonBox.Text = "Summer";
-            seasonBox.Items.Add("Summer");
-            seasonBox.Items.Add("Winter");
-            displayData(summerAllowance);
+            displayData();
             medicalBox.Text = medicalAllowance.ToString();
         }
 
@@ -40,47 +36,40 @@ namespace PUB
 
         private void saveBtn_Click(object sender, EventArgs e)
         {
-            if (seasonBox.Text == "Summer") { saveData(ref summerAllowance); }
-            else if (seasonBox.Text == "Winter") { saveData(ref winterAllowance); }
+            saveData();
             medicalAllowance = Convert.ToDecimal(medicalBox.Text);
             committed = true;
             this.Close();
         }
 
-        private void displayData(decimal[][] data)
+        private void displayData()
         {
             for (int i = 0; i < allowance.RowCount; i++)
             {
                 for (int j = 0; j < allowance.ColumnCount; j++)
                 {
-                    allowance.GetControlFromPosition(j, i).Text = data[j][i].ToString();
+                    allowance.GetControlFromPosition(j, i).Text = allowanceRates[j][i].ToString();
                 }
             }
         }
 
-        private void saveData(ref decimal[][] data)
+        private void saveData()
         {
-            for (int i = 0; i < allowance.RowCount; i++)
-            {
-                for (int j = 0; j < allowance.ColumnCount; j++)
-                {
-                     data[j][i] = Convert.ToDecimal(allowance.GetControlFromPosition(j, i).Text);
+            decimal[][] rates = new decimal[3][];
+            rates[0] = new decimal[10];
+            rates[1] = new decimal[10];
+            rates[2] = new decimal[10];
+            try {
+                for (int i = 0; i < allowance.RowCount; i++) {
+                    for (int j = 0; j < allowance.ColumnCount; j++) {
+                        rates[j][i] = Convert.ToDecimal(allowance.GetControlFromPosition(j, i).Text);
+                    }
                 }
+            } catch {
+                MessageBox.Show("Invalid value for allowance rate.");
+                return;
             }
-        }
-
-        private void seasonBox_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            if (seasonBox.Text == "Summer")
-            {
-                saveData(ref this.winterAllowance);
-                displayData(summerAllowance);
-            }
-            else if (seasonBox.Text == "Winter")
-            {
-                saveData(ref this.summerAllowance);
-                displayData(winterAllowance);
-            }
+            allowanceRates = rates;
         }
     }
 }

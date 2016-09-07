@@ -58,7 +58,7 @@
             this.textBox10.Location = new System.Drawing.Point(625, 7);
             this.textBox10.Name = "textBox10";
             this.textBox10.Size = new System.Drawing.Size(85, 23);
-            this.textBox10.TabIndex = 57;
+            this.textBox10.TabIndex = 3;
             // 
             // label3
             // 
@@ -85,7 +85,7 @@
             this.button1.Location = new System.Drawing.Point(808, 419);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(128, 35);
-            this.button1.TabIndex = 63;
+            this.button1.TabIndex = 6;
             this.button1.Text = "Save";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.saveBtn_Click);
@@ -98,7 +98,7 @@
             this.parkList.Location = new System.Drawing.Point(240, 12);
             this.parkList.Name = "parkList";
             this.parkList.Size = new System.Drawing.Size(203, 21);
-            this.parkList.TabIndex = 88;
+            this.parkList.TabIndex = 2;
             this.parkList.SelectedIndexChanged += new System.EventHandler(this.parkList_SelectedIndexChanged);
             // 
             // parkNumberList
@@ -109,7 +109,7 @@
             this.parkNumberList.Location = new System.Drawing.Point(108, 12);
             this.parkNumberList.Name = "parkNumberList";
             this.parkNumberList.Size = new System.Drawing.Size(70, 21);
-            this.parkNumberList.TabIndex = 182;
+            this.parkNumberList.TabIndex = 1;
             this.parkNumberList.SelectedIndexChanged += new System.EventHandler(this.parkNumberList_SelectedIndexChanged);
             // 
             // label15
@@ -130,8 +130,8 @@
             this.ListOfTenants.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.ListOfTenants.Location = new System.Drawing.Point(0, 59);
             this.ListOfTenants.Name = "ListOfTenants";
-            this.ListOfTenants.Size = new System.Drawing.Size(1080, 350);
-            this.ListOfTenants.TabIndex = 183;
+            this.ListOfTenants.Size = new System.Drawing.Size(1163, 314);
+            this.ListOfTenants.TabIndex = 4;
             this.ListOfTenants.DefaultValuesNeeded += new System.Windows.Forms.DataGridViewRowEventHandler(this.ListOfTenants_DefaultValuesNeeded);
             // 
             // moveoutBtn
@@ -139,7 +139,7 @@
             this.moveoutBtn.Location = new System.Drawing.Point(674, 419);
             this.moveoutBtn.Name = "moveoutBtn";
             this.moveoutBtn.Size = new System.Drawing.Size(128, 35);
-            this.moveoutBtn.TabIndex = 184;
+            this.moveoutBtn.TabIndex = 5;
             this.moveoutBtn.Text = "Move Out";
             this.moveoutBtn.UseVisualStyleBackColor = true;
             this.moveoutBtn.Click += new System.EventHandler(this.moveoutBtn_Click);
@@ -149,7 +149,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(1080, 466);
+            this.ClientSize = new System.Drawing.Size(1164, 483);
             this.Controls.Add(this.moveoutBtn);
             this.Controls.Add(this.ListOfTenants);
             this.Controls.Add(this.parkNumberList);

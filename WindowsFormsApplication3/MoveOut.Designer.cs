@@ -38,36 +38,40 @@
             // moveOutDate
             // 
             this.moveOutDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.moveOutDate.Location = new System.Drawing.Point(34, 78);
+            this.moveOutDate.Location = new System.Drawing.Point(45, 96);
+            this.moveOutDate.Margin = new System.Windows.Forms.Padding(4);
             this.moveOutDate.Name = "moveOutDate";
-            this.moveOutDate.Size = new System.Drawing.Size(121, 20);
-            this.moveOutDate.TabIndex = 0;
+            this.moveOutDate.Size = new System.Drawing.Size(160, 22);
+            this.moveOutDate.TabIndex = 2;
             // 
             // tenantList
             // 
             this.tenantList.FormattingEnabled = true;
-            this.tenantList.Location = new System.Drawing.Point(34, 36);
+            this.tenantList.Location = new System.Drawing.Point(45, 44);
+            this.tenantList.Margin = new System.Windows.Forms.Padding(4);
             this.tenantList.Name = "tenantList";
-            this.tenantList.Size = new System.Drawing.Size(121, 21);
+            this.tenantList.Size = new System.Drawing.Size(160, 24);
             this.tenantList.TabIndex = 1;
             this.tenantList.SelectedIndexChanged += new System.EventHandler(this.tenantList_SelectedIndexChanged);
             // 
             // saveBtn
             // 
-            this.saveBtn.Location = new System.Drawing.Point(12, 120);
+            this.saveBtn.Location = new System.Drawing.Point(16, 148);
+            this.saveBtn.Margin = new System.Windows.Forms.Padding(4);
             this.saveBtn.Name = "saveBtn";
-            this.saveBtn.Size = new System.Drawing.Size(75, 33);
-            this.saveBtn.TabIndex = 2;
+            this.saveBtn.Size = new System.Drawing.Size(100, 41);
+            this.saveBtn.TabIndex = 3;
             this.saveBtn.Text = "Save";
             this.saveBtn.UseVisualStyleBackColor = true;
             this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
             // 
             // cancelBtn
             // 
-            this.cancelBtn.Location = new System.Drawing.Point(108, 120);
+            this.cancelBtn.Location = new System.Drawing.Point(144, 148);
+            this.cancelBtn.Margin = new System.Windows.Forms.Padding(4);
             this.cancelBtn.Name = "cancelBtn";
-            this.cancelBtn.Size = new System.Drawing.Size(75, 33);
-            this.cancelBtn.TabIndex = 3;
+            this.cancelBtn.Size = new System.Drawing.Size(100, 41);
+            this.cancelBtn.TabIndex = 4;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
@@ -75,22 +79,24 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 9);
+            this.label1.Location = new System.Drawing.Point(16, 11);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(171, 13);
+            this.label1.Size = new System.Drawing.Size(225, 17);
             this.label1.TabIndex = 4;
             this.label1.Text = "Select a tenant and move out date";
             // 
             // MoveOut
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(201, 165);
+            this.ClientSize = new System.Drawing.Size(292, 203);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cancelBtn);
             this.Controls.Add(this.saveBtn);
             this.Controls.Add(this.tenantList);
             this.Controls.Add(this.moveOutDate);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MoveOut";
             this.Text = "MoveOut";
             this.Load += new System.EventHandler(this.MoveOut_Load);

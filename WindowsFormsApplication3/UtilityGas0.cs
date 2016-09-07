@@ -13,12 +13,14 @@ namespace PUB
 {
     public partial class UtilityGas0 : Form
     {
+
+        private int currUtilityRateID;
         public char utility = 'G';
-        decimal[][] summerAllowance, winterAllowance;
+        decimal[][] allowance;
         decimal medicalAllowance;
-        List<CommonTools.CustomerCharge> custCharges;
-        List<CommonTools.Tier> tiers;
-        List<CommonTools.Surcharge> surcharges;
+        public List<CommonTools.CustomerCharge> custCharges;
+        public List<CommonTools.Tier> tiers;
+        public List<CommonTools.Surcharge> surcharges;
 
         public UtilityGas0()
         {
@@ -29,15 +31,18 @@ namespace PUB
         {
             DatabaseControl.populateComboBox(ref utilNameList, DatabaseControl.utilCompanyTable, "CompanyName", "UtilityCompanyID",
                 "IsGas=@value0", new Object[] { true });
-            resetData();
+            DatabaseControl.populateComboBox(ref tierSetId, DatabaseControl.tierTable, "TierSetName", "TierSetID");
 
             serviceType.Items.Add("All Services");
             serviceType.Items.Add("Cooking Only");
             serviceType.Items.Add("Space Heating Only");
-
+            serviceType.Items.Add("Minimum Usage Charge");
             usageSurcharge.Items.Add(new CommonTools.Item(1, "Flat Credit/Charge"));
             usageSurcharge.Items.Add(new CommonTools.Item(2, "By Usage"));
             usageSurcharge.Items.Add(new CommonTools.Item(3, "By Days"));
+            usageSurcharge.Items.Add(new CommonTools.Item(4, "By Percentage"));
+
+            resetData();
         }
 
         private void resetData()
@@ -57,15 +62,13 @@ namespace PUB
             tierStatus.Items.Clear();
             tierStatus.Items.Add("");
             tierStatus.Items.Add("Regular");
-            tiers.Add(new CommonTools.Tier('G', ' ', "Regular"));
+            tiers.Add(new CommonTools.Tier('G', "Regular"));
 
-            summerAllowance = new decimal[3][];
-            winterAllowance = new decimal[3][];
+            allowance = new decimal[3][];
             medicalAllowance = 0.00000M;
             for (int i = 0; i < 3; i++)
             {
-                summerAllowance[i] = new decimal[] { 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M };
-                winterAllowance[i] = new decimal[] { 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M };
+                allowance[i] = new decimal[] { 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M, 0.00000M };
             }
         }
 
@@ -76,48 +79,38 @@ namespace PUB
 
         private void nextBtn_Click(object sender, EventArgs e)
         {
-            UtilityGas1 next = new UtilityGas1(ref summerAllowance, ref winterAllowance, ref medicalAllowance);
+            UtilityGas1 next = new UtilityGas1(allowance, medicalAllowance);
             next.ShowDialog();
             if (next.committed)
             {
-                summerAllowance = next.summerAllowance;
-                winterAllowance = next.winterAllowance;
-                medicalAllowance = next.medicalAllowance;
+                this.allowance = next.allowanceRates;
+                this.medicalAllowance = next.medicalAllowance;
             }
         }
 
         private void fillUtilityInfo(Object[] values)
         {
-            String[] fields = new String[] { "EffectiveDate", "Method", "Unit", "HasWinter", "WinterStartDate", "WinterEndDate" };
-            Object[] rateIdInfo = DatabaseControl.getSingleRecord(fields, DatabaseControl.utilRateTable, "UtilityCompanyID=@value0 ORDER BY UtilityRateID DESC", new Object[]{values[0]});
-            effDate.Value = (DateTime)rateIdInfo[0];
-            method.Text = rateIdInfo[1].ToString();
-            measure.Text = rateIdInfo[2].ToString();
-            hasWinter.Checked = (bool)rateIdInfo[3];
-            winterStartDate.Value = (DateTime)rateIdInfo[4];
-            winterEndDate.Value = (DateTime)rateIdInfo[5];
-            
-            int utilRateId = (int)(DatabaseControl.getSingleRecord(new String[] { "UtilityRateID" }, DatabaseControl.utilRateTable,
-                "UtilityCompanyID=@value0 AND UtilityServiceType = @value1 ORDER BY UtilityRateID DESC", new Object[] { values[0], 'G' })[0]);
-            importCustomerCharges(utilRateId);
-            importSurcharges(utilRateId);
-            importTiers(utilRateId);
-            importAllowanceRates(utilRateId);
+            String[] fields = new String[] { "UtilityRateID", "EffectiveDate", "Method", "Unit" };
+            Object[] rateIdInfo = DatabaseControl.getSingleRecord(fields, DatabaseControl.utilRateTable, "UtilityCompanyID=@value0 AND UtilityServiceType=@value1 AND DIRTY=0 ORDER BY EffectiveDate DESC", new Object[]{values[0], 'G'});
+            effDate.Value = (DateTime)rateIdInfo[1];
         }
 
         private void saveBtn_Click(object sender, EventArgs e) {
+            if (!(tierSetId.SelectedItem is CommonTools.Item)) { MessageBox.Show("Please select a tier set."); return; }
+            statusCheck();
             int utilCompanyId, utilRateId;
             Object[] values = { utilNameList.Text,  false, true, false};
             if (utilNameList.SelectedItem is CommonTools.Item) {
                 utilCompanyId = ((CommonTools.Item)utilNameList.SelectedItem).Value;
-                String condition = "UtilityCompanyID=" + utilCompanyId;
-                DatabaseControl.executeUpdateQuery(DatabaseControl.utilCompanyTable, DatabaseControl.utilCompanyColumns, values, condition);
+                //String condition = "UtilityCompanyID=" + utilCompanyId;
+                //DatabaseControl.executeUpdateQuery(DatabaseControl.utilCompanyTable, DatabaseControl.utilCompanyColumns, values, condition);
             }
             else {
                 utilCompanyId = DatabaseControl.executeInsertQuery(DatabaseControl.utilCompanyTable, DatabaseControl.utilCompanyColumns, values);
             }
+            DatabaseControl.executeUpdateQuery(DatabaseControl.utilRateTable, new String[] { "Dirty" }, new Object[] { 1 }, "UtilityCompanyID=" + utilCompanyId + " AND EffectiveDate='" + effDate.Text + "' AND UtilityServiceType='G'");
             utilRateId = DatabaseControl.executeInsertQuery(DatabaseControl.utilRateTable, DatabaseControl.utilRateColumns,
-                new Object[] { utilCompanyId, 'G', effDate.Text, method.Text, measure.Text, hasWinter.Checked, winterStartDate.Value.Date, winterEndDate.Value.Date, 1 });
+                new Object[] { utilCompanyId, 'G', effDate.Text, method.Text, measure.Text, ((CommonTools.Item)tierSetId.SelectedItem).Value, 0 });
             exportCustomerCharges(utilRateId);
             exportSurcharges(utilRateId);
             exportTiers(utilRateId);
@@ -130,6 +123,9 @@ namespace PUB
 
             fillUtilityInfo(DatabaseControl.getSingleRecord(new String[] { "*" },
                 DatabaseControl.utilCompanyTable, "UtilityCompanyID=" + item.Value));
+            DatabaseControl.populateComboBox(ref prevEffDates, DatabaseControl.utilRateTable, "EffectiveDate", "UtilityRateID",
+                "Dirty=@value0 and UtilityCompanyID=@value1 and utilityservicetype = 'G' ORDER BY EffectiveDate DESC", new Object[] { 0, item.Value });
+            prevEffDates.SelectedIndex = 0;
         }
 
         private void exportCustomerCharges(int utilRateId) {
@@ -141,52 +137,28 @@ namespace PUB
 
         private void exportAllowanceRates(int utilRateId) {
             char serviceType, climateZone;
-            if (hasWinter.Checked) {
-                char season = 'S';
-                for (int i = 0; i < summerAllowance.Length; i++) {
-                    serviceType = (char)(i+1+48);
-                    for (int j = 0; j < summerAllowance[i].Length; j++) {
-                        climateZone = (char)(j+48);
-                        Object[] values = { utilRateId, serviceType, season, climateZone, summerAllowance[i][j] };
-                        DatabaseControl.executeInsertQuery(DatabaseControl.baselineAllowanceTable, DatabaseControl.baselineAllowanceColumns, values);
-                    }
-                }
-                season = 'W';
-                for (int i = 0; i < winterAllowance.Length; i++) {
-                    serviceType = (char)(i+1+48);
-                    for (int j = 0; j < winterAllowance[i].Length; j++) {
-                        climateZone = (char)(j + 48);
-                        Object[] values = { utilRateId, serviceType, season, climateZone, winterAllowance[i][j] };
-                        DatabaseControl.executeInsertQuery(DatabaseControl.baselineAllowanceTable, DatabaseControl.baselineAllowanceColumns, values);
-                    }
+            for (int i = 0; i < allowance.Length; i++) {
+                serviceType = (char)(i+1+48);
+                for (int j = 0; j < allowance[i].Length; j++) {
+                    climateZone = (char)(j + 48);
+                    Object[] values = { utilRateId, serviceType, climateZone, allowance[i][j] };
+                    DatabaseControl.executeInsertQuery(DatabaseControl.baselineAllowanceTable, DatabaseControl.baselineAllowanceColumns, values);
                 }
             }
-            else {
-                char season = ' ';
-                for (int i = 0; i < summerAllowance.Length; i++) {
-                    serviceType = (char)(i+1+48);
-                    for (int j = 0; j < summerAllowance[i].Length; j++) {
-                        climateZone = (char)(j + 48);
-                        Object[] values = { utilRateId, serviceType, season, climateZone, summerAllowance[i][j] };
-                        DatabaseControl.executeInsertQuery(DatabaseControl.baselineAllowanceTable, DatabaseControl.baselineAllowanceColumns, values);
-                    }
-                }
-            }
-
             DatabaseControl.executeInsertQuery(DatabaseControl.baselineAllowanceTable, DatabaseControl.baselineAllowanceColumns,
-                new Object[] { utilRateId, 'M', 'M', 'M', medicalAllowance });
+                new Object[] { utilRateId, 'M', 'M', medicalAllowance });
         }
 
         public void exportSurcharges(int utilRateId) {
             foreach (CommonTools.Surcharge surcharge in surcharges) {
-                Object[] values = { utilRateId, surcharge.info, surcharge.status, surcharge.usage, surcharge.rate };
+                Object[] values = { utilRateId, surcharge.info, surcharge.status, surcharge.charge, surcharge.usage, surcharge.rate };
                 DatabaseControl.executeInsertQuery(DatabaseControl.utilSurchargeTable, DatabaseControl.utilSurchargeColumns, values);
             }
         }
 
         private void exportTiers(int utilRateId) {
             foreach (CommonTools.Tier tierSet in tiers) {
-                Object[] values = { utilRateId, tierSet.season, tierSet.chargeType, tierSet.status, tierSet.getTier(1), tierSet.getTier(2), tierSet.getTier(3), tierSet.getTier(4), tierSet.getTier(5) };
+                Object[] values = { utilRateId, tierSet.chargeType, tierSet.status, tierSet.getTier(1), tierSet.getTier(2), tierSet.getTier(3), tierSet.getTier(4), tierSet.getTier(5) };
                 DatabaseControl.executeInsertQuery(DatabaseControl.utilTierRatesTable, DatabaseControl.utilTierRatesColumns, values);
             }
         }
@@ -195,7 +167,7 @@ namespace PUB
             custCharges = new List<CommonTools.CustomerCharge>();
             String condition = "UtilityRateId=@value0";
             String[] fields = { "Status", "Service", "Rate" };
-            ArrayList items = DatabaseControl.getMultipleRecord(fields, DatabaseControl.utilBasicRatesTable, condition, new Object[] { utilRateId });
+            List<Object[]> items = DatabaseControl.getMultipleRecord(fields, DatabaseControl.utilBasicRatesTable, condition, new Object[] { utilRateId });
             foreach (Object[] item in items) {
                 custCharges.Add(new CommonTools.CustomerCharge(item[0].ToString(), Convert.ToChar(item[1]), (decimal)item[2]));
             }
@@ -208,42 +180,31 @@ namespace PUB
 
         private void importAllowanceRates(int utilRateId) {
             char serviceType, climateZone;
-            String condition = "UtilityRateID=@value0 AND ServiceType=@value1 AND Season=@value2 AND ClimateZone=@value3";
-            this.summerAllowance = new decimal[3][];
-            this.winterAllowance = new decimal[3][];
+            String condition = "UtilityRateID=@value0 AND ServiceType=@value1 AND ClimateZone=@value2";
+            this.allowance = new decimal[3][];
 
             for (int i = 0; i < 3; i++) {
-                this.summerAllowance[i] = new decimal[10];
-                this.winterAllowance[i] = new decimal[10];
+                this.allowance[i] = new decimal[10];
                 serviceType = (char)(i + 1 + 48);
                 for (int j = 0; j < 10; j++) {
                     climateZone = (char)(j + 48);
-                    if (hasWinter.Checked) {
-                        Object[] valS = { utilRateId, serviceType, 'S', climateZone };
-                        Object[] recordS = DatabaseControl.getSingleRecord(new String[] { "BaselineAllowanceRate" }, DatabaseControl.baselineAllowanceTable, condition, valS);
-                        Object[] valW = { utilRateId, serviceType, 'W', climateZone };
-                        Object[] recordW = DatabaseControl.getSingleRecord(new String[] { "BaselineAllowanceRate" }, DatabaseControl.baselineAllowanceTable, condition, valW);
-                        this.summerAllowance[i][j] = (decimal)recordS[0];
-                        this.winterAllowance[i][j] = (decimal)recordW[0];
-                    }
-                    else {
-                        Object[] valS = { utilRateId, serviceType, ' ', climateZone };
-                        Object[] recordS = DatabaseControl.getSingleRecord(new String[] { "BaselineAllowanceRate" }, DatabaseControl.baselineAllowanceTable, condition, valS);
-                        this.summerAllowance[i][j] = (decimal)recordS[0];
-                    }
+                    Object[] values = { utilRateId, serviceType, climateZone };
+                    Object[] records = DatabaseControl.getSingleRecord(new String[] { "BaselineAllowanceRate" }, DatabaseControl.baselineAllowanceTable, condition, values);
+                    if (records == null) continue;
+                    this.allowance[i][j] = (decimal)records[0];
                 }
             }
             this.medicalAllowance = (decimal)DatabaseControl.getSingleRecord(new String[] { "BaselineAllowanceRate" }, DatabaseControl.baselineAllowanceTable, condition,
-                new Object[] { utilRateId, 'M', 'M', 'M'} )[0];
+                new Object[] { utilRateId, 'M', 'M'} )[0];
         }
 
         private void importSurcharges(int utilRateId) {
             surcharges = new List<CommonTools.Surcharge>();
-            String[] fields = { "Description", "RateType", "Usage", "Rate" };
+            String[] fields = { "Description", "RateType", "ChargeType", "Usage", "Rate" };
             String condition = "UtilityRateID=@value0";
-            ArrayList surchargeItems = DatabaseControl.getMultipleRecord(fields, DatabaseControl.utilSurchargeTable, condition, new Object[] { utilRateId });
+            List<Object[]> surchargeItems = DatabaseControl.getMultipleRecord(fields, DatabaseControl.utilSurchargeTable, condition, new Object[] { utilRateId });
             foreach (Object[] item in surchargeItems) {
-                CommonTools.Surcharge temp = new CommonTools.Surcharge(item[0].ToString(), item[1].ToString(), (int)item[2], Convert.ToDecimal(item[3]));
+                CommonTools.Surcharge temp = new CommonTools.Surcharge(item[0].ToString(), item[1].ToString(), Convert.ToChar(item[2]), (int)item[3], Convert.ToDecimal(item[4]));
                 surcharges.Add(temp);
                 descSurcharge.Items.Add(item[0].ToString());
                 if (!statusSurcharge.Items.Contains(item[1].ToString())) { statusSurcharge.Items.Add(item[1].ToString()); }
@@ -256,9 +217,9 @@ namespace PUB
             tiers = new List<CommonTools.Tier>();
             String[] fields = { "RateType", "Rate1", "Rate2", "Rate3", "Rate4", "Rate5" };
             String condition = "UtilityRateID=@value0";
-            ArrayList tierSets = DatabaseControl.getMultipleRecord(fields, DatabaseControl.utilTierRatesTable, condition, new Object[] { utilRateId });
+            List<Object[]> tierSets = DatabaseControl.getMultipleRecord(fields, DatabaseControl.utilTierRatesTable, condition, new Object[] { utilRateId });
             foreach (Object[] set in tierSets) {
-                CommonTools.Tier temp = new CommonTools.Tier('G', ' ', set[0].ToString());
+                CommonTools.Tier temp = new CommonTools.Tier('G', set[0].ToString());
                 for (int i = 1; i <= 5; i++) { temp.setTier(i, (decimal)set[i]); }
                 tiers.Add(temp);
                 if (!tierStatus.Items.Contains(set[0].ToString())) { tierStatus.Items.Add(set[0].ToString()); }
@@ -281,6 +242,8 @@ namespace PUB
                         serviceType.Text = "Cooking Only";
                     } else if (item.service == '3') {
                         serviceType.Text = "Space Heating Only";
+                    } else if (item.service == '0') {
+                        serviceType.Text = "Minimum Usage Charge";
                     }
                     custChargeRate.Text = item.rate.ToString();
                     return;
@@ -291,27 +254,16 @@ namespace PUB
             custChargeRate.Text = "0.0000";
         }
 
-        private void displaySurcharge(String description, String status = "") {
-            CommonTools.Surcharge display = null;
-            foreach (CommonTools.Surcharge surcharge in surcharges) {
-                if (surcharge.info == description && (status == "" || surcharge.status == status)) { display = surcharge; break; }
-            }
-            if (display == null) {
-                rateSurcharge.Text = "0.00000";
-                usageSurcharge.Text = "";
-                return;
-            }
-            descSurcharge.Text = display.info;
-            statusSurcharge.Text = display.status.ToString();
-            foreach (CommonTools.Item item in usageSurcharge.Items) {
-                if (item.Value == display.usage) { usageSurcharge.SelectedItem = item; usageSurcharge.Text = item.Text; break; }
-            }
-            rateSurcharge.Text = display.rate.ToString();
+        private void displaySurcharge(CommonTools.Surcharge item) {
+            descSurcharge.Text = item.info;
+            usageSurcharge.Text = CommonTools.Item.getString(ref usageSurcharge, item.usage);
+            statusSurcharge.Text = item.status;
+            rateSurcharge.Text = item.rate.ToString();
         }
 
         private void displayTier(String description) {
             foreach (CommonTools.Tier set in tiers) {
-                if (set.Equals(new CommonTools.Tier('G', ' ', description))) {
+                if (set.Equals(new CommonTools.Tier('G', description))) {
                     tierRatesInput.GetControlFromPosition(0, 0).Text = description;
                     for (int i = 1; i <= 5; i++) {
                         tierRatesInput.GetControlFromPosition(i, 0).Text = set.getTier(i).ToString();
@@ -334,58 +286,54 @@ namespace PUB
         }
 
         private void descSurcharge_SelectedIndexChanged(object sender, EventArgs e) {
-            displaySurcharge(descSurcharge.Text);
+            foreach (CommonTools.Surcharge item in surcharges) {
+                if (item.info == descSurcharge.Text) { displaySurcharge(item); return; };
+            }
+            statusSurcharge.Text = "";
+            usageSurcharge.Text = "";
+            rateSurcharge.Text = "";
         }
 
         private void statusSurcharge_SelectedIndexChanged(object sender, EventArgs e) {
-            displaySurcharge(descSurcharge.Text, statusSurcharge.Text);
+            foreach (CommonTools.Surcharge item in surcharges) {
+                if (item.info == descSurcharge.Text && item.status == statusSurcharge.Text) { displaySurcharge(item); return; };
+            }
+            usageSurcharge.Text = "";
+            rateSurcharge.Text = "";
         }
 
         private void saveSurBtn_Click(object sender, EventArgs e) {
             if (descSurcharge.Text == "") { MessageBox.Show("Please enter a label for surcharge."); return; }
             if (statusSurcharge.Text == "") { MessageBox.Show("Please enter a status for surcharge."); return; }
             if (usageSurcharge.Text == "") { MessageBox.Show("Please select a usage for surcharge."); return; }
-            CommonTools.Surcharge surcharge = new CommonTools.Surcharge(descSurcharge.Text, statusSurcharge.Text, ((CommonTools.Item)usageSurcharge.SelectedItem).Value,
-                Convert.ToDecimal(rateSurcharge.Text));
-            foreach (CommonTools.Surcharge item in surcharges) {
-                if (item.Equals(surcharge)) { surcharges.Remove(item); break; }
-            }
+            CommonTools.Surcharge surcharge = new CommonTools.Surcharge(descSurcharge.Text, statusSurcharge.Text, 'G', ((CommonTools.Item)usageSurcharge.SelectedItem).Value, Convert.ToDecimal(rateSurcharge.Text));
+            surcharges.RemoveAll(item => item.Equals(surcharge));
             surcharges.Add(surcharge);
             if (!descSurcharge.Items.Contains(descSurcharge.Text)) { descSurcharge.Items.Add(descSurcharge.Text); }
-            if (!tierStatus.Items.Contains(statusSurcharge.Text) && statusSurcharge.Text != "All") { tierStatus.Items.Add(statusSurcharge.Text); }
-            if (!statusCustCharge.Items.Contains(statusSurcharge.Text) && statusSurcharge.Text != "All") { statusCustCharge.Items.Add(statusSurcharge.Text); }
+            statusBox();
         }
 
         private void saveCustBtn_Click(object sender, EventArgs e) {
-            if (statusCustCharge.Text == "" || (serviceType.Text != "All Services" && serviceType.Text != "Cooking Only" && serviceType.Text != "Space Heating Only")) { 
+            if (statusCustCharge.Text == "" || !serviceType.Items.Contains(serviceType.Text)) { 
                 MessageBox.Show("Please enter a label for customer charge."); return; 
             }
 
             char service = mapServiceType(serviceType.Text);
             CommonTools.CustomerCharge custCharge = new CommonTools.CustomerCharge(statusCustCharge.Text, service, Convert.ToDecimal(custChargeRate.Text));
-            foreach (CommonTools.CustomerCharge item in custCharges) {
-                if (item.Equals(custCharge)) { custCharges.Remove(item); break; }
-            }
+            custCharges.RemoveAll(item => item.Equals(custCharge));
             custCharges.Add(custCharge);
-
-            if (!tierStatus.Items.Contains(statusCustCharge.Text)) { tierStatus.Items.Add(statusCustCharge.Text); }
-            if (!statusSurcharge.Items.Contains(statusCustCharge.Text)) { statusSurcharge.Items.Add(statusCustCharge.Text); }
-            if (!statusCustCharge.Items.Contains(statusCustCharge.Text)) { statusCustCharge.Items.Add(statusCustCharge.Text); }
+            statusBox();
         }
 
         private void saveTierBtn_Click(object sender, EventArgs e) {
             if (tierStatus.Text == "") { MessageBox.Show("Please enter a label for tier set."); return; }
-            CommonTools.Tier tierSet = new CommonTools.Tier('G', ' ', tierStatus.Text);
+            CommonTools.Tier tierSet = new CommonTools.Tier('G', tierStatus.Text);
             for (int i = 1; i <= 5; i++) {
                 try { tierSet.setTier(i, Convert.ToDecimal(tierRatesInput.GetControlFromPosition(i, 0).Text)); } catch { MessageBox.Show("Please enter valid tier rate."); return; }
             }
-            foreach (CommonTools.Tier set in tiers) {
-                if (set.Equals(tierSet)) { tiers.Remove(set); break; }
-            }
+            tiers.RemoveAll(set => set.Equals(tierSet));
             tiers.Add(tierSet);
-            if (!tierStatus.Items.Contains(tierStatus.Text)) { tierStatus.Items.Add(tierStatus.Text); }
-            if (!statusSurcharge.Items.Contains(tierStatus.Text)) { statusSurcharge.Items.Add(tierStatus.Text); }
-            if (!statusCustCharge.Items.Contains(tierStatus.Text)) { statusCustCharge.Items.Add(tierStatus.Text); }
+            statusBox();
         }
 
         private char mapServiceType(String service) {
@@ -396,6 +344,8 @@ namespace PUB
                 type = '2';
             } else if (serviceType.Text == "Space Heating Only") {
                 type = '3';
+            } else if (serviceType.Text == "Minimum Usage Charge") {
+                type = '0';
             }
             return type;
         }
@@ -405,6 +355,8 @@ namespace PUB
             foreach (CommonTools.CustomerCharge item in custCharges) {
                 if (item.Equals(new CommonTools.CustomerCharge(statusCustCharge.Text, service, 0.0M))) {
                     custCharges.Remove(item);
+                    statusCustCharge.Items.Remove(statusCustCharge.Text);
+                    statusBox();
                     statusCustCharge.Text = "";
                     serviceType.Text = "";
                     custChargeRate.Text = "0.00000";
@@ -418,9 +370,12 @@ namespace PUB
                 if (set.info == descSurcharge.Text && set.status == statusSurcharge.Text) {
                     surcharges.Remove(set);
                     descSurcharge.Items.Remove(set.info);
-                    displaySurcharge("");
+                    statusSurcharge.Items.Remove(set.status);
+                    statusBox();
+                    descSurcharge.Text = "";
                     statusSurcharge.Text = "";
                     usageSurcharge.Text = "";
+                    rateSurcharge.Text = "";
                     break;
                 }
             }
@@ -428,14 +383,93 @@ namespace PUB
 
         private void removeTierBtn_Click(object sender, EventArgs e) {
             foreach (CommonTools.Tier set in tiers) {
-                if (set.Equals(new CommonTools.Tier('G', ' ', tierStatus.Text))) {
+                if (set.Equals(new CommonTools.Tier('G', tierStatus.Text))) {
                     tiers.Remove(set);
+                    tierStatus.Items.Remove(tierStatus.Text);
                     tierRatesInput.GetControlFromPosition(0, 0).Text = "";
                     displayTier(tierStatus.Text);
                     ((ComboBox)tierRatesInput.GetControlFromPosition(0, 0)).Items.Remove(set.status);
+                    statusBox();
                     break;
                 }
             }
+        }
+
+        private void statusBox() {
+            List<String> statuses = new List<String>();
+            foreach (CommonTools.Tier tier in tiers) if (!statuses.Contains(tier.status)) statuses.Add(tier.status);
+            foreach (CommonTools.Surcharge surcharge in surcharges) if (!surcharge.status.Equals("All") && !statuses.Contains(surcharge.status)) statuses.Add(surcharge.status);
+            foreach (CommonTools.CustomerCharge custCharge in custCharges) if (!statuses.Contains(custCharge.status)) statuses.Add(custCharge.status);
+
+            foreach (String status in statuses) {
+                if (!tierStatus.Items.Contains(status)) tierStatus.Items.Add(status);
+                if (!statusSurcharge.Items.Contains(status)) statusSurcharge.Items.Add(status);
+                if (!statusCustCharge.Items.Contains(status)) statusCustCharge.Items.Add(status);
+            }
+        }
+
+        private void statusCheck() {
+            List<String> statuses = new List<String>();
+            foreach (CommonTools.Tier tier in tiers) if (!statuses.Contains(tier.status)) statuses.Add(tier.status);
+            foreach (CommonTools.Surcharge surcharge in surcharges) if (!surcharge.status.Equals("All") && !statuses.Contains(surcharge.status)) statuses.Add(surcharge.status);
+            foreach (CommonTools.CustomerCharge custCharge in custCharges) if (!statuses.Contains(custCharge.status)) statuses.Add(custCharge.status);
+
+            foreach (String status in statuses) {
+                //if (!tiers.Contains(new CommonTools.Tier('D', status))) tiers.Add(new CommonTools.Tier('D', status));
+                if (!tiers.Contains(new CommonTools.Tier('G', status))) tiers.Add(new CommonTools.Tier('G', status));
+                if (!custCharges.Contains(new CommonTools.CustomerCharge(status, '1', 0.0M))) custCharges.Add(new CommonTools.CustomerCharge(status, '1', 0.0M));
+                if (!custCharges.Contains(new CommonTools.CustomerCharge(status, '2', 0.0M))) custCharges.Add(new CommonTools.CustomerCharge(status, '2', 0.0M));
+                if (!custCharges.Contains(new CommonTools.CustomerCharge(status, '3', 0.0M))) custCharges.Add(new CommonTools.CustomerCharge(status, '3', 0.0M));
+                if (!custCharges.Contains(new CommonTools.CustomerCharge(status, '0', 0.0M))) custCharges.Add(new CommonTools.CustomerCharge(status, '0', 0.0M));
+            }
+        }
+
+        private void effDate_ValueChanged(object sender, EventArgs e) {
+            if (!(utilNameList.SelectedItem is CommonTools.Item)) return;
+            else {
+                int companyId = ((CommonTools.Item)utilNameList.SelectedItem).Value;
+                String[] fields = new String[] { "UtilityRateID", "EffectiveDate", "Method", "Unit", "TierSetID" };
+                Object[] rateIdInfo = DatabaseControl.getSingleRecord(fields, DatabaseControl.utilRateTable, "UtilityCompanyID=@value0 AND EffectiveDate=@value1 AND DIRTY=0 AND UtilityServiceType='G'", new Object[] { companyId, effDate.Value.Date });
+                if (rateIdInfo == null) { return; }
+                effDate.Value = (DateTime)rateIdInfo[1];
+                method.Text = rateIdInfo[2].ToString();
+                measure.Text = rateIdInfo[3].ToString();
+                tierSetId.Text = CommonTools.Item.getString(ref tierSetId, (int)rateIdInfo[4]);
+
+                displayRateToolStripMenuItem.Visible = true;
+                descSurcharge.Items.Clear();
+                statusSurcharge.Items.Clear();
+                tierStatus.Items.Clear();
+                statusCustCharge.Items.Clear();
+                statusCustCharge.Items.Add("");
+                descSurcharge.Items.Add("");
+                statusSurcharge.Items.Add("");
+                statusSurcharge.Items.Add("All");
+                tierStatus.Items.Add("");
+                descSurcharge.Refresh();
+
+                int utilRateId = (int)rateIdInfo[0];
+                currUtilityRateID = (int)rateIdInfo[0];
+                importCustomerCharges(utilRateId);
+                importSurcharges(utilRateId);
+                importTiers(utilRateId);
+                importAllowanceRates(utilRateId);
+                statusBox();
+            }
+        }
+
+        private void displayRateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ViewUtilityRateForm vf = new ViewUtilityRateForm(this, currUtilityRateID, ref custCharges, ref tiers, ref surcharges);
+            vf.Show();
+        }
+
+        private void usageSurcharge_SelectedIndexChanged(object sender, EventArgs e) {
+            foreach (CommonTools.Surcharge item in surcharges) {
+                if (item.info == descSurcharge.Text && item.status == statusSurcharge.Text && 
+                    item.usage == ((CommonTools.Item)usageSurcharge.SelectedItem).Value) { displaySurcharge(item); return; };
+            }
+            rateSurcharge.Text = "";
         }
     }
 }

@@ -46,6 +46,9 @@
             this.newBtn = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.prevReadDate = new System.Windows.Forms.DateTimePicker();
             ((System.ComponentModel.ISupportInitialize)(this.watValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gasValue)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.eleValue)).BeginInit();
@@ -53,11 +56,11 @@
             // 
             // prevBtn
             // 
-            this.prevBtn.Location = new System.Drawing.Point(158, 257);
-            this.prevBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.prevBtn.Location = new System.Drawing.Point(158, 315);
+            this.prevBtn.Margin = new System.Windows.Forms.Padding(4);
             this.prevBtn.Name = "prevBtn";
             this.prevBtn.Size = new System.Drawing.Size(32, 28);
-            this.prevBtn.TabIndex = 0;
+            this.prevBtn.TabIndex = 11;
             this.prevBtn.Text = "<<";
             this.prevBtn.UseVisualStyleBackColor = true;
             this.prevBtn.Click += new System.EventHandler(this.prevBtn_Click);
@@ -65,7 +68,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(73, 71);
+            this.label1.Location = new System.Drawing.Point(12, 71);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 17);
@@ -75,7 +78,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(73, 144);
+            this.label2.Location = new System.Drawing.Point(12, 202);
             this.label2.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(37, 17);
@@ -85,7 +88,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(73, 174);
+            this.label6.Location = new System.Drawing.Point(12, 232);
             this.label6.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(34, 17);
@@ -95,7 +98,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(73, 206);
+            this.label7.Location = new System.Drawing.Point(12, 264);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(39, 17);
@@ -104,11 +107,11 @@
             // 
             // nextBtn
             // 
-            this.nextBtn.Location = new System.Drawing.Point(303, 257);
-            this.nextBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.nextBtn.Location = new System.Drawing.Point(303, 315);
+            this.nextBtn.Margin = new System.Windows.Forms.Padding(4);
             this.nextBtn.Name = "nextBtn";
             this.nextBtn.Size = new System.Drawing.Size(32, 28);
-            this.nextBtn.TabIndex = 14;
+            this.nextBtn.TabIndex = 12;
             this.nextBtn.Text = ">>";
             this.nextBtn.UseVisualStyleBackColor = true;
             this.nextBtn.Click += new System.EventHandler(this.nextBtn_Click);
@@ -116,7 +119,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(73, 38);
+            this.label12.Location = new System.Drawing.Point(12, 38);
             this.label12.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(45, 17);
@@ -125,8 +128,8 @@
             // 
             // watValue
             // 
-            this.watValue.Location = new System.Drawing.Point(159, 203);
-            this.watValue.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.watValue.Location = new System.Drawing.Point(159, 261);
+            this.watValue.Margin = new System.Windows.Forms.Padding(4);
             this.watValue.Maximum = new decimal(new int[] {
             10000000,
             0,
@@ -134,12 +137,12 @@
             0});
             this.watValue.Name = "watValue";
             this.watValue.Size = new System.Drawing.Size(176, 22);
-            this.watValue.TabIndex = 26;
+            this.watValue.TabIndex = 7;
             // 
             // gasValue
             // 
-            this.gasValue.Location = new System.Drawing.Point(159, 139);
-            this.gasValue.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.gasValue.Location = new System.Drawing.Point(159, 197);
+            this.gasValue.Margin = new System.Windows.Forms.Padding(4);
             this.gasValue.Maximum = new decimal(new int[] {
             10000000,
             0,
@@ -147,12 +150,12 @@
             0});
             this.gasValue.Name = "gasValue";
             this.gasValue.Size = new System.Drawing.Size(176, 22);
-            this.gasValue.TabIndex = 25;
+            this.gasValue.TabIndex = 5;
             // 
             // eleValue
             // 
-            this.eleValue.Location = new System.Drawing.Point(159, 171);
-            this.eleValue.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.eleValue.Location = new System.Drawing.Point(159, 229);
+            this.eleValue.Margin = new System.Windows.Forms.Padding(4);
             this.eleValue.Maximum = new decimal(new int[] {
             10000000,
             0,
@@ -160,35 +163,35 @@
             0});
             this.eleValue.Name = "eleValue";
             this.eleValue.Size = new System.Drawing.Size(176, 22);
-            this.eleValue.TabIndex = 24;
+            this.eleValue.TabIndex = 6;
             // 
             // readDate
             // 
             this.readDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
             this.readDate.Location = new System.Drawing.Point(159, 105);
-            this.readDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.readDate.Margin = new System.Windows.Forms.Padding(4);
             this.readDate.Name = "readDate";
             this.readDate.Size = new System.Drawing.Size(176, 22);
-            this.readDate.TabIndex = 32;
+            this.readDate.TabIndex = 3;
             // 
             // saveBtn
             // 
-            this.saveBtn.Location = new System.Drawing.Point(158, 320);
-            this.saveBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.saveBtn.Location = new System.Drawing.Point(158, 378);
+            this.saveBtn.Margin = new System.Windows.Forms.Padding(4);
             this.saveBtn.Name = "saveBtn";
             this.saveBtn.Size = new System.Drawing.Size(82, 28);
-            this.saveBtn.TabIndex = 39;
+            this.saveBtn.TabIndex = 9;
             this.saveBtn.Text = "Save";
             this.saveBtn.UseVisualStyleBackColor = true;
             this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
             // 
             // cancelBtn
             // 
-            this.cancelBtn.Location = new System.Drawing.Point(248, 320);
-            this.cancelBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cancelBtn.Location = new System.Drawing.Point(248, 378);
+            this.cancelBtn.Margin = new System.Windows.Forms.Padding(4);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(87, 28);
-            this.cancelBtn.TabIndex = 40;
+            this.cancelBtn.TabIndex = 10;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
@@ -197,29 +200,29 @@
             // 
             this.parkList.FormattingEnabled = true;
             this.parkList.Location = new System.Drawing.Point(159, 34);
-            this.parkList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.parkList.Margin = new System.Windows.Forms.Padding(4);
             this.parkList.Name = "parkList";
             this.parkList.Size = new System.Drawing.Size(176, 24);
-            this.parkList.TabIndex = 41;
+            this.parkList.TabIndex = 1;
             this.parkList.SelectedIndexChanged += new System.EventHandler(this.parkNumber_SelectedIndexChanged);
             // 
             // spaceList
             // 
             this.spaceList.FormattingEnabled = true;
             this.spaceList.Location = new System.Drawing.Point(159, 68);
-            this.spaceList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.spaceList.Margin = new System.Windows.Forms.Padding(4);
             this.spaceList.Name = "spaceList";
             this.spaceList.Size = new System.Drawing.Size(176, 24);
-            this.spaceList.TabIndex = 42;
+            this.spaceList.TabIndex = 2;
             this.spaceList.SelectedIndexChanged += new System.EventHandler(this.spaceNumber_SelectedIndexChanged);
             // 
             // newBtn
             // 
-            this.newBtn.Location = new System.Drawing.Point(195, 257);
-            this.newBtn.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.newBtn.Location = new System.Drawing.Point(195, 315);
+            this.newBtn.Margin = new System.Windows.Forms.Padding(4);
             this.newBtn.Name = "newBtn";
             this.newBtn.Size = new System.Drawing.Size(100, 28);
-            this.newBtn.TabIndex = 43;
+            this.newBtn.TabIndex = 8;
             this.newBtn.Text = "New";
             this.newBtn.UseVisualStyleBackColor = true;
             this.newBtn.Click += new System.EventHandler(this.newBtn_Click);
@@ -227,7 +230,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(72, 107);
+            this.label3.Location = new System.Drawing.Point(11, 107);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(0, 17);
             this.label3.TabIndex = 44;
@@ -236,17 +239,46 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(73, 110);
+            this.label4.Location = new System.Drawing.Point(12, 110);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(45, 17);
+            this.label4.Size = new System.Drawing.Size(139, 17);
             this.label4.TabIndex = 45;
-            this.label4.Text = "DATE";
+            this.label4.Text = "METER READ DATE";
+            // 
+            // label5
+            // 
+            this.label5.Location = new System.Drawing.Point(12, 142);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(105, 39);
+            this.label5.TabIndex = 48;
+            this.label5.Text = "PREV METER READ DATE";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(11, 144);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(0, 17);
+            this.label8.TabIndex = 47;
+            this.label8.Tag = "DATE";
+            // 
+            // prevReadDate
+            // 
+            this.prevReadDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.prevReadDate.Location = new System.Drawing.Point(159, 142);
+            this.prevReadDate.Margin = new System.Windows.Forms.Padding(4);
+            this.prevReadDate.Name = "prevReadDate";
+            this.prevReadDate.Size = new System.Drawing.Size(176, 22);
+            this.prevReadDate.TabIndex = 4;
             // 
             // MeterReads
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(424, 380);
+            this.ClientSize = new System.Drawing.Size(460, 420);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label8);
+            this.Controls.Add(this.prevReadDate);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.newBtn);
@@ -265,7 +297,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.prevBtn);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MeterReads";
             this.Text = "MeterReads";
             this.Load += new System.EventHandler(this.MeterReads_Load);
@@ -297,5 +329,8 @@
         private System.Windows.Forms.Button newBtn;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.DateTimePicker prevReadDate;
     }
 }

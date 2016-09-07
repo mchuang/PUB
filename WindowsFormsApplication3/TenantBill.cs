@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,76 +14,231 @@ namespace PUB
 {
     public partial class TenantBill : Form
     {
-        int parkId, parkSpaceId, meterReadId;
+        int parkId, parkSpaceId, meterReadId, orderId;
+        Object[] parkInfo;
+        Object[] parkMessage;
+        DateTime dueDate;
+
         public TenantBill()
         {
             InitializeComponent();
+            parkReportToolStripMenuItem.Visible = false;
         }
 
         private void TenantBill_Load(object sender, EventArgs e)
         {
+            tenantToolStripMenuItem.Visible = false;
             tenantList.Enabled = false;
             readDate.Enabled = false;
-            DatabaseControl.populateComboBox(ref parkList, DatabaseControl.parkTable, "ParkNumber", "ParkID");
+            DatabaseControl.populateComboBox(ref parkList, DatabaseControl.parkTable, "ParkNumber", "ParkID", "1=1 ORDER BY ParkNumber", new Object[] {});
         }
 
         private void parkList_SelectedIndexChanged(object sender, EventArgs e)
         {
             tenantList.Enabled = true;
             readDate.Enabled = false;
+            historyBtn.Visible = false;
+            billBtn.Visible = false;
+            moveOut.Visible = false;
             tenantList.Items.Clear();
-            int parkId = ((CommonTools.Item)parkList.SelectedItem).Value;
-            DatabaseControl.populateComboBox(ref tenantList, DatabaseControl.spaceTable, "Tenant", "ParkSpaceID", "ParkID=@value0 AND MoveOutDate IS NULL", new Object[] { parkId });
+            spaceList.Items.Clear();
+            parkReportToolStripMenuItem.Visible = true;
+
+            parkId = ((CommonTools.Item)parkList.SelectedItem).Value;
+            Object[] read;
+            try
+            {
+                read = DatabaseControl.getSingleRecord(new String[] { "StartDate", "MeterReadDate" }, DatabaseControl.meterReadsTable, "ParkID=@value0 ORDER BY DueDate DESC", new Object[] { parkId });
+                if (read == null) throw(null);
+            }
+            catch
+            {
+                MessageBox.Show("No billing info is available!");
+                return;
+            }
+            DatabaseControl.populateComboBox(ref tenantList, DatabaseControl.spaceTable, "Tenant", "ParkSpaceID", "ParkID=@value0 AND (MoveOutDate IS NULL OR MoveOutDate > @value1) AND MoveInDate < @value2 ORDER BY OrderID ASC", new Object[] { parkId, read[0], read[1] });
+            DatabaseControl.populateComboBox(ref spaceList, DatabaseControl.spaceTable, "OrderID", "ParkSpaceID", "ParkID=@value0 AND (MoveOutDate IS NULL OR MoveOutDate > @value1) AND MoveInDate < @value2 ORDER BY OrderID ASC", new Object[] { parkId, read[0], read[1] });
+            String[] fields = { "ParkName", "Address", "City", "State", "ZipCode", "ParkNumber" };
+            String condition = "ParkID=@value0";
+            parkInfo = DatabaseControl.getSingleRecord(fields, DatabaseControl.parkTable, condition, new Object[] { this.parkId });
+            clerkInfo.Text = String.Format("{0}\n{1}\n{2}, {3} {4}", parkInfo);
+            tenantInfo.Text = usageInfo.Text = readInfo.Text = "";
+            eleInfo.Text = gasInfo.Text = watInfo.Text = "";
+            tenantList.Text = readDate.Text = "";
+            spaceList.Text = "";
+            summaryOfCharges.Rows.Clear();
+            summaryOfCharges.Refresh();
+            tempCharges.Rows.Clear();
+            tempCharges.Refresh();
+            this.Size = new Size(970, 150);
+        }
+
+
+        private void spaceList_SelectedIndexChanged(object sender, EventArgs e) {
+            parkReportToolStripMenuItem.Visible = false;
+            tenantList.Text = CommonTools.Item.getString(ref tenantList, ((CommonTools.Item)spaceList.SelectedItem).Value);
         }
 
         private void tenantList_SelectedIndexChanged(object sender, EventArgs e)
         {
+            parkReportToolStripMenuItem.Visible = false;
+            tenantToolStripMenuItem.Visible = true;
+            historyBtn.Visible = true;
+            billBtn.Visible = true;
             readDate.Enabled = true;
             readDate.Items.Clear();
             parkId = ((CommonTools.Item)parkList.SelectedItem).Value;
             parkSpaceId = ((CommonTools.Item)tenantList.SelectedItem).Value;
-            TenantBilling bill = new TenantBilling(parkId, parkSpaceId);
-            displayBill(bill.generateBill());
-            String spaceId = DatabaseControl.getSingleRecord(new String[] { "SpaceID" }, DatabaseControl.spaceTable,
-                "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0].ToString();
-            DatabaseControl.populateComboBox(ref readDate, DatabaseControl.meterReadsTable, "MeterReadDate", "MeterReadID",
-                "ParkID=@value0 AND SpaceID=@value1", new Object[] { parkId, spaceId });
+            spaceList.Text = CommonTools.Item.getString(ref spaceList, ((CommonTools.Item)tenantList.SelectedItem).Value);
+            orderId = (int)DatabaseControl.getSingleRecord(new String[] { "OrderID" }, DatabaseControl.spaceTable,
+                "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0];
+            String[] fields = { "Tenant", "Address1", "Address2", "City", "State", "Zip" };
+            String condition = "ParkSpaceID=@value0";
+            object[] tenant = DatabaseControl.getSingleRecord(fields, DatabaseControl.spaceTable, condition, new Object[] { this.parkSpaceId });
+            Object movedOut = DatabaseControl.getSingleRecord(new String[] { "MoveOutDate" }, DatabaseControl.spaceTable, condition, new Object[] { this.parkSpaceId })[0];
+            if (movedOut == DBNull.Value) { moveOut.Visible = true; } else { moveOut.Visible = false; }
+            tenantInfo.Text = String.Format("{0}\tSpace # {2}\n{1}\n{3}, {4} {5}", tenant);
+            DatabaseControl.populateComboBox(ref readDate, DatabaseControl.meterReadsTable, "DueDate", "MeterReadID",
+                "ParkID=@value0 AND OrderID=@value1 ORDER BY DueDate DESC, MeterReadDate DESC", new Object[] { parkId, orderId });
+            readDate.SelectedIndex = 0;
+            this.Size = new Size(970, 750);
         }
 
         private void readDate_SelectedIndexChanged(object sender, EventArgs e) {
             meterReadId = ((CommonTools.Item)readDate.SelectedItem).Value;
-            Object[] read = DatabaseControl.getSingleRecord(DatabaseControl.meterReadsColumns, DatabaseControl.meterReadsTable, "MeterReadID=@value0", 
-                new Object[] { meterReadId });
-            TenantBilling bill = new TenantBilling(parkId, parkSpaceId, read);
-            displayBill(bill.generateBill());
+            Object[] read = DatabaseControl.getSingleRecord(new String[] { "DueDate", "StartDate", "MeterReadDate" }, 
+                DatabaseControl.meterReadsTable, "MeterReadID=@value0", new Object[] { meterReadId });
+            BillCalculation bill = new BillCalculation(parkId, parkSpaceId, (DateTime)read[0]);
+            dueDate = (DateTime)read[0];
+            Object[] previous = DatabaseControl.getSingleRecord(new String[] { "ParkSpaceID" }, 
+                DatabaseControl.spaceTable, "ParkID=@value0 AND OrderID=@value1 AND MoveInDate<=@value2 AND MoveOutDate>=@value3", 
+                new Object[] { parkId, orderId, read[1], read[2] });
+            if (previous != null) {
+                parkSpaceId = (int)previous[0];
+                String[] fields = { "Tenant", "Address1", "Address2", "City", "State", "Zip" };
+                String condition = "ParkSpaceID=@value0";
+                object[] tenant = DatabaseControl.getSingleRecord(fields, DatabaseControl.spaceTable, condition, new Object[] { this.parkSpaceId });
+                Object movedOut = DatabaseControl.getSingleRecord(new String[] { "MoveOutDate" }, DatabaseControl.spaceTable, condition, new Object[] { this.parkSpaceId })[0];
+                if (movedOut == DBNull.Value) { moveOut.Visible = true; } else { moveOut.Visible = false; }
+                tenantInfo.Text = String.Format("{0}\tSpace # {6}\n{1}\n{3}, {4} {5}", tenant, orderId);
+            }
+
+            parkMessage = DatabaseControl.getSingleRecord(new String[] { "TopMessage", "BotMessage" }, DatabaseControl.messageTable, 
+                "ParkID=@value0 AND DueDate=@value1", new Object[] { parkId, dueDate });
+            if (parkMessage == null) parkMessage = DatabaseControl.getSingleRecord(new String[] { "TopMessage", "BotMessage" }, DatabaseControl.messageTable,
+                "ParkID=@value0 ORDER BY DueDate DESC", new Object[] { parkId });
+            topMessageInput.Text = parkMessage[0].ToString();
+            botMessageInput.Text = parkMessage[1].ToString();
+            displayBill(bill.generateBill(), (DateTime)read[0]);
         }
 
         private void billBtn_Click(object sender, EventArgs e) {
-            if (parkId != -1 && parkSpaceId != -1) {
-                TenantBilling bill = new TenantBilling(parkId, parkSpaceId);
-                Object[] info = bill.generateBill();
-                info[8] = getSummaryOfCharges();
-                PdfControl.createBillPdf(info);
+            List<Object[]> spaces = new List<Object[]>();
+            DateTime dueDate;
+            if (parkList.SelectedIndex != -1 && tenantList.SelectedIndex != -1) {
+                dueDate = (DateTime)DatabaseControl.getSingleRecord(new String[] { "DueDate" }, DatabaseControl.meterReadsTable, "MeterReadID=@value0",
+                    new Object[] { meterReadId })[0];
+                saveSummaryOfCharges(parkSpaceId, dueDate);
+                saveTempCharges(parkSpaceId, dueDate);
+                parkMessage[0] = topMessageInput.Text;
+                parkMessage[1] = botMessageInput.Text;
+                billComputation(new Object[] { parkSpaceId }, dueDate);
+                MessageBox.Show("Done generating Pdf!");
+                return;
+            } else if (parkList.SelectedIndex != -1) {
+                Object[] dateInfo = DatabaseControl.getSingleRecord(new String[] { "StartDate", "MeterReadDate", "DueDate" }, DatabaseControl.periodTable,
+                    "ParkID=@value0 ORDER BY DueDate DESC", new Object[] { parkId });
+                dueDate = (DateTime)dateInfo[2];
+                parkMessage = DatabaseControl.getSingleRecord(new String[] { "TopMessage", "BotMessage" }, DatabaseControl.messageTable, 
+                    "ParkID=@value0 AND DueDate=@value1", new Object[] { parkId, dueDate });
+                if (parkMessage == null) {
+                    parkMessage = DatabaseControl.getSingleRecord(new String[] { "TopMessage", "BotMessage" }, DatabaseControl.messageTable,
+                        "ParkID=@value0 ORDER BY DueDate DESC", new Object[] { parkId });
+                    DatabaseControl.executeInsertQuery(DatabaseControl.messageTable, new String[] { "ParkID", "DueDate", "TopMessage", "BotMessage" },
+                        new Object[] { parkId, dueDate, parkMessage[0], parkMessage[1] });
+                }
+                //String query = "SELECT ParkSpaceID FROM ParkSpaceTenant JOIN (SELECT OrderID, MAX(MoveInDate) MaxDate FROM MyTable GROUP BY OrderID) t ON ParkSpaceTenant.OrderID = t.OrderID AND ParkSpaceTenant.MoveInDate = t.MaxDate";
+                spaces = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID" }, "ParkSpaceTenant JOIN (SELECT OrderID, MAX(MoveInDate) MaxDate FROM ParkSpaceTenant WHERE ParkID=@value0 AND MoveInDate<@value1 GROUP BY OrderID) t ON ParkSpaceTenant.OrderID = t.OrderID AND ParkSpaceTenant.MoveInDate = t.MaxDate", 
+                    "ParkID=@value0", new Object[] { parkId, dateInfo[1] });
+                //spaces = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID" }, DatabaseControl.spaceTable,
+                    //"ParkID=@value0 AND MoveInDate<@value2 AND (MoveOutDate IS NULL OR MoveOutDate>@value1) ORDER BY OrderID", new Object[] { parkId, dateInfo[0], dateInfo[1] });
+            } else {
+                return;
             }
+            //DatabaseControl.deleteRecords(DatabaseControl.spaceBillTable, "DueDate=@value0", new Object[] { dueDate });
+            //DatabaseControl.deleteRecords(DatabaseControl.spaceTempChargeTable, "DueDate=@value0", new Object[] { dueDate });
+            //DatabaseControl.deleteRecords(DatabaseControl.spaceChargeTable, "DueDate=@value0", new Object[] { dueDate });
+            System.Diagnostics.Stopwatch timer = new System.Diagnostics.Stopwatch();
+            timer.Start();
+            Parallel.ForEach(spaces.AsEnumerable(), delegate(Object[] space) { billComputation(space, dueDate); });
+            timer.Stop();
+            MessageBox.Show("Done generating Pdf. Time(seconds):" + timer.Elapsed.TotalSeconds);
         }
 
-        private void displayBill(Object[] info) {
-            tenantInfo.Text = "";
-            clerkInfo.Text = "";
-            usageInfo.Text = "";
-            readInfo.Text = "";
-            gasInfo.Text = "";
-            watInfo.Text = "";
-            eleInfo.Text = "";
+        private void billComputation(Object[] space, DateTime dueDate) {
+            BillCalculation bill = new BillCalculation(parkId, (int)space[0], dueDate);
+            Object[] info = bill.generateBill();
+            decimal gasTotal, eleTotal, watTotal;
+            gasTotal = (decimal)((Object[])info[5])[2];
+            eleTotal = (decimal)((Object[])info[6])[2];
+            watTotal = (decimal)((Object[])info[7])[2];
+            List<Object[]> summary = getSummaryOfCharges((int)space[0], dueDate);
+            List<Object[]> temporary = getTempCharges((int)space[0], bill.start, bill.end, bill.dueDate);
+            List<Object[]> charges = new List<Object[]>();
+            foreach (Object[] charge in summary) charges.Add(charge);
+            foreach (Object[] charge in temporary) charges.Add(charge);
+            charges.Add(new Object[] { "Utilities", gasTotal + eleTotal + watTotal });
+            info[3] = parkInfo;
+            info[8] = charges;
+            info[11] = parkMessage;
+
+            //PdfControl.createBillPdf((int)space[0], info);
+            //PdfControl.createBillPrint((int)space[0], info);
+            Object[] usage = (Object[])info[4];
+
+            String condition = "ParkSpaceID=@value0 AND DueDate=@value1";
+            DatabaseControl.deleteRecords(DatabaseControl.spaceBillTable, condition,
+                new Object[] { (int)space[0], bill.dueDate });
+            DatabaseControl.deleteRecords(DatabaseControl.spaceChargeTable, condition,
+                new Object[] { (int)space[0], bill.dueDate});
+            DatabaseControl.deleteRecords(DatabaseControl.spaceTempChargeTable, condition,
+                new Object[] { (int)space[0], bill.dueDate });
+
+            Object[] utilUsage = (Object[])usage[0];
+            Object[] gasReads = (Object[])usage[1];
+            Object[] eleReads = (Object[])usage[2];
+            Object[] watReads = (Object[])usage[3];
+
+            Object[] values = { (int)space[0], bill.dueDate, gasReads[3], gasReads[4], utilUsage[1], gasTotal, eleReads[3], eleReads[4], utilUsage[4], eleTotal, watReads[3], watReads[4], utilUsage[7], watTotal };
+            DatabaseControl.executeInsertQuery(DatabaseControl.spaceBillTable, DatabaseControl.spaceBillColumns, values);
+            foreach (Object[] item in summary) {
+                values = new Object[] { (int)space[0], bill.dueDate, item[0], item[1], item[2] };
+                DatabaseControl.executeInsertQuery(DatabaseControl.spaceChargeTable, DatabaseControl.spaceChargeColumns, values);
+            }
+            foreach (Object[] item in temporary) {
+                if (item[0].ToString().Equals("Utilities")) continue;
+                values = new Object[] { (int)space[0], bill.dueDate, item[0], item[1] };
+                DatabaseControl.executeInsertQuery(DatabaseControl.spaceTempChargeTable, DatabaseControl.spaceTempChargeColumns, values);
+            }
+        }
+        
+        private void displayBill(Object[] info, DateTime dueDate) {
+            tenantInfo.Text = clerkInfo.Text = usageInfo.Text = readInfo.Text = "";
+            gasInfo.Text = watInfo.Text = eleInfo.Text = "";
             displayTenantInfo((Object[])info[2]);
-            displayClerkInfo((Object[])info[3]);
+            displayClerkInfo(parkInfo);
             displayUsageInfo((Object[])((Object[])info[4])[0]);
             displayReadInfo((Object[])info[4]);
             displayGasInfo((Object[])info[5]);
             displayEleInfo((Object[])info[6]);
             displayWatInfo((Object[])info[7]);
-            decimal utilities = (decimal)((Object[])info[5])[7] + (decimal)((Object[])info[6])[9] + (decimal)((Object[])info[7])[6];
-            displaySummaryOfCharges(parkId, utilities);
+            decimal gasTotal, eleTotal, watTotal;
+            if (info[5] != null) gasTotal = (decimal)((Object[])info[5])[2]; else gasTotal = 0;
+            if (info[6] != null) eleTotal = (decimal)((Object[])info[6])[2]; else eleTotal = 0;
+            if (info[7] != null) watTotal = (decimal)((Object[])info[7])[2]; else watTotal = 0;
+            decimal utilities = gasTotal + eleTotal + watTotal;
+            displaySummaryOfCharges(dueDate);
+            displayTempCharges(utilities, dueDate);
         }
 
         private void displayTenantInfo(Object[] info) {
@@ -94,144 +250,230 @@ namespace PUB
         }
 
         private void displayUsageInfo(Object[] info) {
-            usageInfo.Text = String.Format("Days:{0}\tUsage:{1}\tLast Year:{2}\tDays:{3}\tUsage:{4}\tLast Year:{5}\tDays:{6}\tUsage:{7}\tLast Year:{8}", info);
+            for (int i = 0; i < info.Length; i++) if ((int)info[i] == -1) info[i] = "";
+            usageInfo.Text = String.Format("(GAS)Days:{0, -6}Usage:{1, -6}Last Year:{2}|(ELE)Days:{3, -6}Usage:{4, -6}Last Year:{5}|(WAT)Days:{6, -6}Usage:{7, -6}Last Year:{8}", info);
         }
 
         private void displayReadInfo(Object[] info) {
-            foreach (Object[] item in info) {
-                if (item.Length > 8) continue;
-                readInfo.Text += String.Format("{0}\t\t{1}\t\t{2}\t\t{3}\t\t{4}\t\t{5}\t\t{6}\t\t{7}\n", item);
+            for (int i = 1; i <= 3; i++) {
+                Object[] item = (Object[])info[i];
+                readInfo.Text += String.Format("{0, -3}{1, 15}{2, 15}{3, 15}{4, 15}{5, 15}{6, 15}{7, 15}", item);
+                if (i != 3) readInfo.Text += "\n";
             }
         }
 
         private void displayGasInfo(Object[] info) {
             String gas = "";
-            gas += String.Format("Gas\t\t\t\t\t{0}\n", ((decimal)info[0]).ToString("G29"));
-
-            Object[] custCharge = (Object[])info[1];
-            if ((decimal)custCharge[1] != 0.0M) gas += String.Format("\n{0, -27} | {1, 8}\n", custCharge[0], ((decimal)custCharge[1]).ToString("C2"));
-
-            if ((decimal)info[3] != 0.0M) {
-                List<Object[]> gen = (List<Object[]>)info[2];
-                foreach (Object[] item in gen) {
-                    if ((decimal)item[1] != 0.0M) gas += String.Format("\n  {0, -25} | {1, 8}", item[0], ((decimal)item[1]).ToString("C2"));
-                }
-                gas += String.Format("\nGeneration Total:\t\t{0}\n", ((decimal)info[3]).ToString("C2"));
+            if (info == null) {
+                gas += String.Format("Gas{0, 35}\n", 0);
+                gas += String.Format("\nTotal: {0, 25}", (0.00M).ToString());
+                gasInfo.Text = gas;
+                return;
             }
 
-            List<Object[]> surcharge = (List<Object[]>)info[4];
-            foreach (Object[] item in surcharge) {
-                if ((decimal)item[1] != 0.0M) gas += String.Format("\n  {0, -25} | {1, 8}", item[0], ((decimal)item[1]).ToString("C2"));
+            gas += String.Format("Gas{0, 35}\n", info[0]);
+
+            List<Object[]> details = (List<Object[]>)info[1];
+            foreach (Object[] item in details) {
+                String description = item[0].ToString();
+                if (description.Length >= 25) description += String.Format("\n  {0, -25}", "");
+
+                if (item.Length == 1) gas += description + "\n";
+                else if ((decimal)item[1] != 0.0M) gas += String.Format("  {0, -25} | {1, 8}\n", description, item[1]);
             }
 
-            List<Object[]> tax = (List<Object[]>)info[5];
-            foreach (Object[] item in tax) {
-                if ((decimal)item[1] != 0.0M) gas += String.Format("\n  {0, -25} | {1, 8}", item[0], ((decimal)item[1]).ToString("C2"));
-            }
-
-            gas += String.Format("\n{0}", info[6]);
-            gas += String.Format("\nTotal: \t\t{0, 10}", ((decimal)info[7]).ToString("C2"));
+            gas += String.Format("\nTotal: {0, 25}", info[2]);
 
             gasInfo.Text = gas;
         }
 
         private void displayEleInfo(Object[] info) {
             String ele = "";
-            ele += String.Format("Ele\t\t\t\t\t{0}", ((decimal)info[0]).ToString("G29"));
-
-            Object[] custCharge = (Object[])info[1];
-            if ((decimal)custCharge[1] != 0.0M) ele += String.Format("\n{0, -27} {1, 8}\n", custCharge[0], ((decimal)custCharge[1]).ToString("G29"));
-
-            if ((decimal)info[3] != 0.0M) {
-                List<Object[]> gen = (List<Object[]>)info[2];
-                foreach (Object[] item in gen) {
-                    if ((decimal)item[1] != 0.0M) ele += String.Format("\n  {0, -25} | {1, 8}", item[0], ((decimal)item[1]).ToString("C2"));
-                }
-                ele += String.Format("\nDelivery Total:\t{0, 10}\n", ((decimal)info[3]).ToString("C2"));
+            if (info == null) {
+                ele += String.Format("Ele{0, 35}\n", 0);
+                ele += String.Format("\nTotal: {0, 25}", (0.00M).ToString());
+                eleInfo.Text = ele;
+                return;
             }
 
-            if ((decimal)info[5] != 0.0M) {
-                List<Object[]> gen = (List<Object[]>)info[4];
-                foreach (Object[] item in gen) {
-                    if ((decimal)item[1] != 0.0M) ele += String.Format("\n  {0, -25} | {1, 8}", item[0], ((decimal)item[1]).ToString("C2"));
-                }
-                ele += String.Format("\nGeneration Total:\t{0, 10}\n", ((decimal)info[5]).ToString("C2"));
+            ele += String.Format("Ele{0, 35}\n", info[0]);
+
+            List<Object[]> details = (List<Object[]>)info[1];
+            foreach (Object[] item in details) {
+                String description = item[0].ToString();
+                if (item.Length == 1) { ele += description + "\n"; continue; } 
+                if (description.Length >= 25) description += String.Format("\n  {0, -25}", "");
+                if ((decimal)item[1] != 0.0M) ele += String.Format("  {0, -25} | {1, 8}\n", description, item[1]);
             }
 
-            List<Object[]> surcharge = (List<Object[]>)info[6];
-            foreach (Object[] item in surcharge) {
-                if ((decimal)item[1] != 0.0M) ele += String.Format("\n  {0, -25} | {1, 8}", item[0], ((decimal)item[1]).ToString("C2"));
-            }
-
-            List<Object[]> tax = (List<Object[]>)info[7];
-            foreach (Object[] item in tax) {
-                if ((decimal)item[1] != 0.0M) ele += String.Format("\n  {0, -25} | {1, 8}", item[0], ((decimal)item[1]).ToString("C2"));
-            }
-
-            ele += String.Format("\n{0}", info[8]);
-            ele += String.Format("\nTotal: \t\t{0, 8}", ((decimal)info[9]).ToString("C2"));
+            ele += String.Format("\nTotal: {0, 25}", info[2]);
 
             eleInfo.Text = ele;
         }
 
         private void displayWatInfo(Object[] info) {
             String wat = "";
-            wat += String.Format("Wat\t\t\t\t\t{0}\n", ((decimal)info[0]).ToString("G29"));
-
-            Object[] custCharge = (Object[])info[1];
-            if ((decimal)custCharge[1] != 0.0M) wat += String.Format("{0, -27} | {1, 8}\n\n", custCharge[0], ((decimal)custCharge[1]).ToString("C2"));
-
-            if ((decimal)info[3] != 0.0M) {
-                List<Object[]> gen = (List<Object[]>)info[2];
-                foreach (Object[] item in gen) {
-                    if ((decimal)item[1] != 0.0M) wat += String.Format("  {0, -25} | {1, 8}\n", item[0], ((decimal)item[1]).ToString("C2"));
-                }
-                wat += String.Format("Generation Total:\t{0, 10}\n", ((decimal)info[3]).ToString("C2"));
+            if (info == null) {
+                wat += String.Format("Wat{0, 35}\n", 0);
+                wat += String.Format("\nTotal: {0, 25}", (0.00M).ToString());
+                watInfo.Text = wat;
+                return;
             }
 
-            List<Object[]> surcharge = (List<Object[]>)info[4];
-            foreach (Object[] item in surcharge) {
-                if ((decimal)item[1] != 0.0M) wat += String.Format("\n  {0, -25} | {1, 8}\n", item[0], ((decimal)item[1]).ToString("C2"));
+            wat += String.Format("Wat{0, 35}\n", info[0]);
+
+            List<Object[]> details = (List<Object[]>)info[1];
+            foreach (Object[] item in details) {
+                String description = item[0].ToString();
+                if (description.Length >= 25) description += String.Format("\n  {0, -25}", "");
+                if ((decimal)item[1] != 0.0M) wat += String.Format("  {0, -25} | {1, 8}\n", description, item[1]);
             }
 
-            List<Object[]> tax = (List<Object[]>)info[5];
-            foreach (Object[] item in tax) {
-                if ((decimal)item[1] != 0.0M) wat += String.Format("\n  {0, -25} | {1, 8}", item[0], ((decimal)item[1]).ToString("C2"));
-            }
-
-            wat += String.Format("\nTotal: \t\t{0, 10}", ((decimal)info[6]).ToString("C2"));
+            wat += String.Format("\nTotal: {0, 25}", info[2]);
 
             watInfo.Text = wat;
         }
 
-        private void displaySummaryOfCharges(int parkId, decimal utilTotal) {
+        private void displaySummaryOfCharges(DateTime dueDate) {
             summaryOfCharges.Columns.Clear();
-            DataTable data = new DataTable();
-            String table = DatabaseControl.parkOptionsTable + " JOIN " + DatabaseControl.optionsTable + " ON ChargeItem.ChargeItemID=ParkChargeItem.ChargeItemID";
-            DatabaseControl.populateDataTable(ref data, "ChargeItemDescription, ChargeItemValue", table, "ParkId=@value0", new Object[] { parkId });
-
             summaryOfCharges.Columns.Add("optionName", "Option");
             summaryOfCharges.Columns["optionName"].Width = 180;
             summaryOfCharges.Columns.Add("optionCharge", "Charge");
             summaryOfCharges.Columns["optionCharge"].Width = 80;
+            summaryOfCharges.Columns.Add("optionCode", "Code");
+            summaryOfCharges.Columns["optionCode"].Width = 40;
 
-            for (int i = 0; i < data.Rows.Count; i++ ) {
-                summaryOfCharges.Rows.Add(1);
-                summaryOfCharges.Rows[i].Cells["optionName"].Value = data.Rows[i]["ChargeItemDescription"];
-                summaryOfCharges.Rows[i].Cells["optionCharge"].Value = ((decimal)data.Rows[i]["ChargeItemValue"]).ToString("N2");
+            //String condition = "ParkSpaceID=@value0 AND DueDate=@value1";
+            String condition = "ParkSpaceID=@value0 AND DueDate=@value1";
+            List<Object[]> items = DatabaseControl.getMultipleRecord(new String[] { "Description", "ChargeItemValue", "ChargeItemID" }, 
+                DatabaseControl.spaceChargeTable, condition, new Object[] { parkSpaceId, dueDate });
+            if (items.Count == 0) {
+                String table = DatabaseControl.parkOptionsTable + " JOIN " + DatabaseControl.optionsTable + " ON ChargeItem.ChargeItemID=ParkChargeItem.ChargeItemID";
+                List<Object[]> parkItems = DatabaseControl.getMultipleRecord(new String[] { "ChargeItemDescription, ChargeItemValue", "ChargeItem.ChargeItemID" }, table,
+                        "ParkId=@value0 ORDER BY ChargeItem.ChargeItemID ASC", new Object[] { parkId });
+
+                condition = "ParkSpaceID=@value0 AND DueDate=(SELECT MAX(DueDate) FROM ParkSpaceCharge WHERE ParkSpaceID=@value0)";
+                items = DatabaseControl.getMultipleRecord(new String[] { "Description", "ChargeItemValue", "ChargeItemID" },
+                    DatabaseControl.spaceChargeTable, condition, new Object[] { parkSpaceId, dueDate });
+                List<String> temp = new List<String>();
+                foreach (Object[] item in items) temp.Add(item[0].ToString());
+
+                decimal offset = 0M;
+                foreach (Object[] parkItem in parkItems) if (!temp.Contains(parkItem[0].ToString())) items.Add(parkItem);
+
+                foreach (Object[] item in items) if (item[0].ToString() == "Balance Forward" || item[0].ToString() == "Late Charge" || item[0].ToString() == "Concession") item[1] = 0M; else offset -= (decimal)item[1];
+                bool concession = (bool)DatabaseControl.getSingleRecord(new String[] { "Concession" }, DatabaseControl.spaceTable, "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0];
+                foreach (Object[] item in items) { if (item[0].ToString() == "Concession" && concession) item[1] = offset; }
             }
-            summaryOfCharges.Rows.Add(1);
-            summaryOfCharges.Rows[summaryOfCharges.RowCount - 2].Cells["optionName"].Value = "Utilities";
-            summaryOfCharges.Rows[summaryOfCharges.RowCount - 2].Cells["optionCharge"].Value = utilTotal.ToString("N2");
+
+            if (!items.Exists(delegate(Object[] obj) { return obj[0].ToString() == "Balance Forward"; })) items.Add(new Object[] { "Balance Forward", 0.00M, 1 });
+            if (!items.Exists(delegate(Object[] obj) { return obj[0].ToString() == "Late Charge"; })) items.Add(new Object[] { "Late Charge", 0.00M, 2 });
+
+            for (int i = 0; i < items.Count; i++) {
+                Object[] item = items[i];
+                summaryOfCharges.Rows.Add();
+                summaryOfCharges.Rows[i].Cells["optionName"].Value = item[0].ToString();
+                summaryOfCharges.Rows[i].Cells["optionCharge"].Value = ((decimal)item[1]).ToString("N2");
+                summaryOfCharges.Rows[i].Cells["optionCode"].Value = (int)item[2];
+            }
+
+            summaryOfCharges.Columns["optionName"].ReadOnly = true;
+            summaryOfCharges.Columns["optionCode"].ReadOnly = true;
+            summaryOfCharges.Sort(summaryOfCharges.Columns["optionCode"], ListSortDirection.Ascending);
+            summaryOfCharges.AllowUserToAddRows = false;
+            summaryOfCharges.AllowUserToDeleteRows = false;
+            this.ActiveControl = summaryOfCharges;
+            summaryOfCharges.ClearSelection();
+            if (summaryOfCharges.Rows.Count > 0) summaryOfCharges.CurrentCell = summaryOfCharges[1, 0];
         }
 
-        private Object[] getSummaryOfCharges() {
-            Object[] summary = new Object[summaryOfCharges.RowCount - 1];
-            for (int i = 0; i < summaryOfCharges.RowCount - 1; i++) {
-                DataGridViewRow row = summaryOfCharges.Rows[i];
-                summary[i] = new Object[] { row.Cells["optionName"].Value, Convert.ToDecimal(row.Cells["optionCharge"].Value) };
+        private void displayTempCharges(decimal utilTotal, DateTime dueDate) {
+            tempCharges.Columns.Clear();
+            tempCharges.Columns.Add("optionName", "Temporary Option");
+            tempCharges.Columns["optionName"].Width = 180;
+            tempCharges.Columns.Add("optionCharge", "Charge");
+            tempCharges.Columns["optionCharge"].Width = 80;
+            ArrayList temp;
+
+            String condition = "ParkSpaceID=@value0 AND DueDate=@value1";
+            temp = DatabaseControl.getMultipleRecordDict(new String[] { "Description", "ChargeItemValue" }, DatabaseControl.spaceTempChargeTable, condition, 
+                new Object[] { parkSpaceId, dueDate });
+
+            /*if (temp.Count == 0) {
+                condition = "OrderID=@value0 AND DueDate=@value1";
+                int orderId = (int)DatabaseControl.getSingleRecord(new String[] { "OrderID" }, DatabaseControl.spaceTable, "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0];
+                Object[] readDates = DatabaseControl.getSingleRecord(new String[] { "StartDate", "MeterReadDate" },
+                    DatabaseControl.meterReadsTable, condition, new Object[] { orderId, dueDate });
+                temp = DatabaseControl.getMultipleRecordDict(new String[] { "Description", "Charge" }, DatabaseControl.tempChargeTable,
+                    "ParkID=@value0 AND DateAssigned>=@value1 AND DateAssigned<@value2", new Object[] { parkId, readDates[0], readDates[1] });
+            }*/
+            
+            for(int i = 0; i < temp.Count; i++ ) {
+                Dictionary<String, Object> charge = (Dictionary<String, Object>)temp[i];
+                tempCharges.Rows.Add();
+                tempCharges.Rows[i].Cells["optionName"].Value = charge["Description"].ToString();
+                tempCharges.Rows[i].Cells["optionCharge"].Value = ((decimal)charge["ChargeItemValue"]).ToString("N2");
             }
-            return summary;
+
+            tempCharges.Rows.Add();
+            tempCharges.Rows[tempCharges.RowCount - 2].Cells["optionName"].Value = "Utilities";
+            tempCharges.Rows[tempCharges.RowCount - 2].Cells["optionCharge"].Value = utilTotal.ToString("N2");
+
+            tempCharges.ClearSelection();
+            tempCharges.CurrentCell = tempCharges[1, 0];
+        }
+
+        public List<Object[]> getSummaryOfCharges(int parkSpaceId, DateTime dueDate) {
+            List<Object[]> previousItems = DatabaseControl.getMultipleRecord(new String[] { "Description", "ChargeItemValue", "ChargeItemID" }, DatabaseControl.spaceChargeTable,
+                "ParkSpaceID=@value0 AND DueDate=@value1 ORDER BY ChargeItemID ASC", new Object[] { parkSpaceId, dueDate });
+            if (previousItems.Count == 0) {
+                String table = DatabaseControl.parkOptionsTable + " JOIN " + DatabaseControl.optionsTable + " ON ChargeItem.ChargeItemID=ParkChargeItem.ChargeItemID";
+                List<Object[]> items = DatabaseControl.getMultipleRecord(new String[] { "ChargeItemDescription", "ChargeItemValue", "ChargeItem.ChargeItemID" }, table, "ParkId=@value0 ORDER BY ChargeItem.ChargeItemID ASC", new Object[] { parkId });
+
+                previousItems = DatabaseControl.getMultipleRecord(new String[] { "Description", "ChargeItemValue", "ChargeItemID" }, DatabaseControl.spaceChargeTable,
+                    "ParkSpaceID=@value0 AND DueDate=(SELECT MAX(DueDate) FROM ParkSpaceCharge WHERE ParkSpaceID=@value0) ORDER BY ChargeItemID ASC", new Object[] { parkSpaceId });
+                List<String> temp = new List<String>();
+                foreach (Object[] previous in previousItems) temp.Add(previous[0].ToString());
+
+                foreach (Object[] item in items) if (!temp.Contains(item[0].ToString())) previousItems.Add(item);
+                decimal offset = 0M;
+                foreach (Object[] item in previousItems) if ((int)item[2] == 1 || (int)item[2] == 2) item[1] = 0M; else offset -= (decimal)item[1];
+
+                bool concession = (bool)DatabaseControl.getSingleRecord(new String[] { "Concession" }, DatabaseControl.spaceTable, "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0];
+                foreach (Object[] item in items) { if ((int)item[2] == 8 && concession) item[1] = offset; }
+            }
+            return previousItems;
+        }
+
+        private void saveSummaryOfCharges(int parkSpaceId, DateTime dueDate) {
+            String condition = "ParkSpaceID=@value0 AND DueDate=@value1";
+            DatabaseControl.deleteRecords(DatabaseControl.spaceChargeTable, condition,
+                new Object[] { parkSpaceId, dueDate });
+            foreach (DataGridViewRow row in summaryOfCharges.Rows) {
+                Object[] values = new Object[] { parkSpaceId, dueDate, row.Cells["optionName"].Value, Decimal.Round(Convert.ToDecimal(row.Cells["optionCharge"].Value), 2), Convert.ToInt32(row.Cells["optionCode"].Value) };
+                DatabaseControl.executeInsertQuery(DatabaseControl.spaceChargeTable, DatabaseControl.spaceChargeColumns, values);
+            }
+        }
+
+        private void saveTempCharges(int parkSpaceId, DateTime dueDate) {
+            String condition = "ParkSpaceID=@value0 AND DueDate=@value1";
+            DatabaseControl.deleteRecords(DatabaseControl.spaceTempChargeTable, condition, new Object[] { parkSpaceId, dueDate });
+
+            foreach (DataGridViewRow row in tempCharges.Rows) {
+                if (row.IsNewRow || row.Cells["optionName"].Value.ToString() == "Utilities") continue;
+                Object[] values = new Object[] { parkSpaceId, dueDate, row.Cells["optionName"].Value, Convert.ToDecimal(row.Cells["optionCharge"].Value) };
+                DatabaseControl.executeInsertQuery(DatabaseControl.spaceTempChargeTable, DatabaseControl.spaceTempChargeColumns, values);
+            }
+        }
+
+        public List<Object[]> getTempCharges(int parkSpaceId, DateTime start, DateTime end, DateTime dueDate) {
+            List<Object[]> temp = DatabaseControl.getMultipleRecord(new String[] { "Description", "ChargeItemValue" }, DatabaseControl.spaceTempChargeTable,
+                "ParkSpaceID=@value0 AND DueDate=@value1", new Object[] { parkSpaceId, dueDate });
+            /*if (temp.Count == 0) {
+                temp = DatabaseControl.getMultipleRecord(new String[] { "Description", "Charge"}, DatabaseControl.tempChargeTable,
+                    "ParkID=@value0 AND DateAssigned>=@value1 AND DateAssigned<=@value2", new Object[] { parkId, start, end });
+            }*/
+            return temp;
         }
 
         private void historyBtn_Click(object sender, EventArgs e) {
@@ -240,360 +482,319 @@ namespace PUB
             if (parkId != -1 && parkSpaceId != -1) {
                 ReadHistory history = new ReadHistory(parkId, parkSpaceId);
                 history.ShowDialog();
+                readDate.SelectedIndex = 0;
+                readDate_SelectedIndexChanged(sender, e);
             }
         }
 
-        public class TenantBilling {
-            int parkId, parkSpaceId, parkNumber;
-            String spaceId;
-            Object[] meterRead;
-
-            private static int minTier = 1;
-            private static int maxTier = 5;
-
-            public TenantBilling(int parkId, int parkSpaceId) {
-                this.parkId = parkId;
-                this.parkSpaceId = parkSpaceId;
-                this.parkNumber = (int)DatabaseControl.getSingleRecord(new String[] { "ParkNumber" }, DatabaseControl.parkTable, "ParkID=@value0",
-                new Object[] { parkId })[0];
-                this.spaceId = DatabaseControl.getSingleRecord(new String[] { "SpaceID" }, DatabaseControl.spaceTable, "ParkID=@value0 AND ParkSpaceID=@value1",
-                new Object[] { parkId, parkSpaceId })[0].ToString();
-
-                ArrayList reads = DatabaseControl.getMultipleRecord(DatabaseControl.meterReadsColumns, DatabaseControl.meterReadsTable,
-                    "ParkID=@value0 AND SpaceID=@value1 ORDER BY MeterReadID DESC", new Object[] { parkId, spaceId });
-                meterRead = (Object[])reads[0];
+        private void reportBtn_Click(object sender, EventArgs e) {
+            if (parkList.SelectedIndex != -1) {
+                ParkReport report = new ParkReport(parkId);
+                Object[] read = DatabaseControl.getSingleRecord(new String[] { "DueDate" }, DatabaseControl.periodTable,
+                    "ParkID=@value0 ORDER BY DueDate DESC", new Object[] { parkId });
+                report.generateSummReport((DateTime)read[0]);
+                MessageBox.Show("Park Billing Report is generated!");
             }
+        }
 
-            public TenantBilling(int parkId, int parkSpaceId, Object[] currRead) {
-                this.parkId = parkId;
-                this.parkSpaceId = parkSpaceId;
-                meterRead = currRead;
+        private void utilBtn_Click(object sender, EventArgs e) {
+            if (parkList.SelectedIndex != -1) {
+                ParkReport report = new ParkReport(parkId);
+                Object[] read = DatabaseControl.getSingleRecord(new String[] { "DueDate" }, DatabaseControl.meterReadsTable,
+                    "ParkID=@value0 ORDER BY MeterReadDate DESC", new Object[] { parkId });
+                report.generateUtilReport((DateTime)read[0]);
+
+                MessageBox.Show("Park Utility Report is generated!");
             }
+        }
 
-            public Object[] generateBill() {
-                Object[] tenant = getTenantAddr();
-                Object[] park = getParkAddr();
-                Object[] ele = calculateEleTotalCost();
-                Object[] gas = calculateGasTotalCost();
-                Object[] wat = calculateWatTotalCost();
-                Object[] usage = getReadData(0.0M, (decimal)ele[ele.Length - 1], 0.0M);
-                //PdfControl.createBillPdf(parkNumber, spaceId, tenant, park, usage, gas, ele, wat);
-                return new Object[] { parkNumber, spaceId, tenant, park, usage, gas, ele, wat, null };
+        private void parkBillsToolStripMenuItem_Click(object sender, EventArgs e) {
+            if (parkList.SelectedIndex != -1) {
+                billBtn_Click(sender, e);
             }
+        }
 
-            public Object[] getTenantAddr() {
-                String[] fields = { "Tenant", "Address1", "Address2", "City", "State", "Zip" };
-                String condition = "ParkSpaceID=@value0";
-                return DatabaseControl.getSingleRecord(fields, DatabaseControl.spaceTable, condition, new Object[] { this.parkSpaceId });
+        private void moveOut_Click(object sender, EventArgs e) {
+            MoveOut move = new MoveOut(parkId, parkSpaceId);
+            Object[] tempInfo = DatabaseControl.getSingleRecord(new String[] { "OrderID", "SpaceID" }, DatabaseControl.spaceTable, "ParkSpaceID=@value0",
+                new Object[] { parkSpaceId });
+            move.ShowDialog();
+            if (move.newTenant) {
+                ParkSpaceInfo newTenant = new ParkSpaceInfo();
+                newTenant.fillParkSpaceInfo(parkId, (int)tempInfo[0], tempInfo[1].ToString());
+                newTenant.ShowDialog();
             }
+            tenantList_SelectedIndexChanged(sender, e);
+        }
 
-            public Object[] getParkAddr() {
-                String[] fields = { "ParkName", "Address", "City", "State", "ZipCode" };
-                String condition = "ParkID=@value0";
-                return DatabaseControl.getSingleRecord(fields, DatabaseControl.parkTable, condition, new Object[] { this.parkId });
+        private void eCReportToolStripMenuItem_Click(object sender, EventArgs e) {
+            if (parkList.SelectedIndex != -1) {
+                ParkReport report = new ParkReport(parkId);
+                Object[] read = DatabaseControl.getSingleRecord(new String[] { "StartDate", "MeterReadDate" }, DatabaseControl.meterReadsTable,
+                    "ParkID=@value0 ORDER BY MeterReadDate DESC", new Object[] { parkId });
+                report.generateExtraChargesReport((DateTime)read[0], (DateTime)read[1]);
+                MessageBox.Show("Extra Charges Report is generated!");
             }
+        }
 
-            public Object[] getReadData(decimal gasTotal, decimal eleTotal, decimal watTotal) {
-                Object[] usages = new Object[] { null, (int)meterRead[3] - (int)meterRead[6], meterRead[9],
-                                             null, (int)meterRead[4] - (int)meterRead[7], meterRead[10],
-                                             null, (int)meterRead[5] - (int)meterRead[8], meterRead[11] };
-                Object[] gas = new Object[] { "GAS", ((DateTime)meterRead[2]).ToString("MM/dd"), ((DateTime)meterRead[2]).ToString("MM/dd"), meterRead[6], meterRead[3], null,
-                (int)meterRead[3] - (int)meterRead[6], gasTotal.ToString("C2") };
-                Object[] ele = new Object[] { "ELE", ((DateTime)meterRead[2]).ToString("MM/dd"), ((DateTime)meterRead[2]).ToString("MM/dd"), meterRead[7], meterRead[4], null,
-                (int)meterRead[4] - (int)meterRead[7], eleTotal.ToString("C2") };
-                Object[] wat = new Object[] { "WAT", ((DateTime)meterRead[2]).ToString("MM/dd"), ((DateTime)meterRead[2]).ToString("MM/dd"), meterRead[8], meterRead[5], null,
-                (int)meterRead[5] - (int)meterRead[8], watTotal.ToString("C2") };
-                return new Object[] { usages, gas, ele, wat };
+        private void readSheetToolStripMenuItem_Click(object sender, EventArgs e) {
+            if (parkList.SelectedIndex != -1) {
+                ParkReport report = new ParkReport(parkId);
+                SelectDate obj = new SelectDate(parkId);
+                obj.ShowDialog();
+                
+                report.generateReadSheet(obj.readDateSelected);
+                MessageBox.Show("Read Sheet generated!");
             }
+        }
 
-            public Object[] calculateGasTotalCost() {
-                int utilRateId, tierSetId, numDays, numMed;
-                char season, zone, serviceType;
-                String rateType;
-                decimal usage, baseline, medAllowance;
+        private void collectionsToolStripMenuItem_Click(object sender, EventArgs e) {
+            Object dueDate = DatabaseControl.getSingleRecord(new String[] { "DueDate" }, DatabaseControl.periodTable, "ParkID=@value0 ORDER BY DueDate DESC", new Object[] { parkId })[0];
+            String santiago = DatabaseControl.getSingleRecord(new String[] { "CsvId" }, DatabaseControl.parkTable, "ParkID=@value0", new Object[] { parkId })[0].ToString();
+            if (santiago == "") {
+                Object[] meterReadDates = DatabaseControl.getSingleRecord(new String[] { "StartDate", "MeterReadDate" }, DatabaseControl.periodTable,
+                        "ParkID=@value0 ORDER BY DueDate DESC", new Object[] { parkId });
+                List<Object[]> spaces = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID" }, DatabaseControl.spaceTable,
+                        "ParkID=@value0 AND (MoveOutDate IS NULL OR MoveOutDate > @value1) AND MoveInDate < @value2", new Object[] { parkId, (DateTime)meterReadDates[0], (DateTime)meterReadDates[1] });
+                List<Object[]> rows = new List<Object[]>();
+                String table = DatabaseControl.parkOptionsTable + " JOIN " + DatabaseControl.optionsTable + " ON ChargeItem.ChargeItemID=ParkChargeItem.ChargeItemID";
+                List<Object[]> parkCharge = DatabaseControl.getMultipleRecord(new String[] { "ChargeItemDescription" }, table, "ParkID=@value0 ORDER BY ChargeItemCode", new Object[] { parkId });
+                foreach (Object[] space in spaces) {
+                    Object[] startend = new Object[] { meterReadDates[0], meterReadDates[1] };
+                    Dictionary<String, Object> moveDates = DatabaseControl.getSingleRecordDict(new String[] { "MoveInDate", "MoveOutDate" },
+                        DatabaseControl.spaceTable, "ParkSpaceID=@value0", new Object[] { (int)space[0] });
+                    if (moveDates["MoveOutDate"] != DBNull.Value) startend[1] = moveDates["MoveOutDate"];
+                    if ((DateTime)moveDates["MoveInDate"] > (DateTime)meterReadDates[0]) startend[0] = moveDates["MoveInDate"];
+                    String[] tenantFields = new String[] { "SpaceID", "Tenant", "GasStatus", "GasType", "EleStatus", "EleType", "WatStatus", "GasMedical", "EleMedical", "DontBillForGas", "DontBillForEle", "DontBillForWat", "OrderID" };
+                    Dictionary<String, Object> tenantInfo = DatabaseControl.getSingleRecordDict(DatabaseControl.spaceColumns, DatabaseControl.spaceTable,
+                        "ParkID=@value0 AND ParkSpaceID=@value1", new Object[] { parkId, space[0] });
+                    String[] billFields = new String[] { "GasPreviousRead", "GasCurrentRead", "GasUsage", "GasBill", "ElePreviousRead", "EleCurrentRead", "EleUsage", "EleBill", "WatPreviousRead", "WatCurrentRead", "WatUsage", "WatBill" };
+                    Dictionary<String, Object> billInfo = DatabaseControl.getSingleRecordDict(DatabaseControl.spaceBillColumns, DatabaseControl.spaceBillTable,
+                        "ParkSpaceID=@value0 AND DueDate=@value1", new Object[] { space[0], dueDate });
+                    if (billInfo == null || billInfo.Count == 0) { continue; }
+                    List<Object[]> summary = DatabaseControl.getMultipleRecord(new String[] { "Description", "ChargeItemValue", "ParkSpaceCharge.ChargeItemID" }, 
+                        DatabaseControl.spaceChargeTable + " JOIN " + DatabaseControl.optionsTable + " ON ChargeItem.ChargeItemID=ParkSpaceCharge.ChargeItemID",
+                        "ParkSpaceID=@value0 AND DueDate=@value1 ORDER BY ChargeItemCode ASC", new Object[] { (int)space[0], dueDate });
+                    List<Object[]> temporary = getTempCharges((int)space[0], (DateTime)startend[0], (DateTime)startend[1], (DateTime)dueDate);
+                    decimal balFw = 0M;
+                    decimal lateCh = 0M;
+                    foreach (Object[] item in summary) {
+                        if ((int)item[2] == 1) {
+                            balFw = (decimal)item[1];
+                        } else if ((int)item[2] == 2) {
+                            lateCh = (decimal)item[1];
+                        }
+                    }
 
-                int gasCompanyId = (int)DatabaseControl.getSingleRecord(new String[] { "GasCompanyID" }, DatabaseControl.parkTable,
-                    "ParkID=@value0", new Object[] { parkId })[0];
-
-                Object[] utilCompany = DatabaseControl.getSingleRecord(new String[] { "UtilityRateID", "HasWinter", "WinterStartDate", "WinterEndDate", "TierSetID" }, DatabaseControl.utilRateTable,
-                    "UtilityCompanyID=@value0 ORDER BY UtilityRateID DESC", new Object[] { gasCompanyId });
-
-                utilRateId = (int)utilCompany[0];
-                tierSetId = (int)utilCompany[4];
-                if ((bool)utilCompany[1]) {
-                    DateTime winterStart = (DateTime)utilCompany[1];
-                    DateTime winterEnd = (DateTime)utilCompany[2];
-                    if (winterStart < DateTime.Today && winterEnd > DateTime.Today) { season = 'W'; } else { season = 'S'; }
-                } else {
-                    season = ' ';
+                    rows.Add(new Object[] { tenantInfo, startend[1], startend[0], balFw, lateCh, summary, temporary, billInfo });
                 }
-                zone = Convert.ToChar(DatabaseControl.getSingleRecord(new String[] { "GasZone" }, DatabaseControl.parkTable,
-                    "ParkID=@value0", new Object[] { parkId })[0]);
-                rateType = DatabaseControl.getSingleRecord(new String[] { "GasStatus" }, DatabaseControl.spaceTable,
-                    "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0].ToString();
-                if (rateType == "") { rateType = "Regular"; }
-                serviceType = Convert.ToChar(DatabaseControl.getSingleRecord(new String[] { "GasType" }, DatabaseControl.spaceTable,
-                    "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0]);
-                numMed = (int)DatabaseControl.getSingleRecord(new String[] { "MedStatus" }, DatabaseControl.spaceTable,
-                    "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0];
-
-                usage = (int)meterRead[3] - (int)meterRead[6];
-                numDays = (int)(((DateTime)meterRead[2]).Date - ((DateTime)meterRead[2]).Date).TotalDays;
-                baseline = getBaselineAllowance(utilRateId, season, serviceType, zone);
-                medAllowance = getBaselineAllowance(utilRateId, 'M', 'M', 'M');
-
-                Object[] custCharge = calculateBasicCost(utilRateId, serviceType, rateType, numDays);
-
-                List<Object[]> generation = calculateTierCost(utilRateId, 'G', rateType, ' ', tierSetId, usage, baseline * numDays + numMed * medAllowance);
-                decimal generationTotal = 0.0M;
-                foreach (Object[] item in generation) {
-                    generationTotal += (decimal)item[1];
+                CommonTools.createCollectionsCSV(parkId, (DateTime)dueDate, rows, parkCharge);
+            } else {
+                String table = DatabaseControl.spaceTable + " JOIN " + DatabaseControl.spaceChargeTable + " ON ParkSpaceTenant.ParkSpaceID=ParkSpaceCharge.ParkSpaceID JOIN " +
+                DatabaseControl.optionsTable + " ON ParkSpaceCharge.Description=ChargeItem.ChargeItemDescription";
+                String[] fields = new String[] { "SpaceID", "Description", "DueDate", "ChargeItemSantiago", "ChargeItemValue" };
+                String condition = "DueDate=@value0 AND ParkID=@value1 ORDER BY SpaceID";
+                ArrayList info = DatabaseControl.getMultipleRecordDict(fields, table, condition, new Object[] { dueDate, parkId });
+                
+                fields = new String[] { "SpaceID", "GasBill", "EleBill", "WatBill" };
+                table = DatabaseControl.spaceTable + " JOIN " + DatabaseControl.spaceBillTable + 
+                    " ON ParkSpaceTenant.ParkSpaceID=ParkSpaceBill.ParkSpaceID";
+                ArrayList items = DatabaseControl.getMultipleRecordDict(fields, table, condition, new Object[] { dueDate, parkId });
+                foreach (Dictionary<String, Object> item in items) {
+                    info.Add(new Dictionary<String, Object>() { 
+                        {"SpaceID", item["SpaceID"]},
+                        {"Description", "Electric"},
+                        {"DueDate", dueDate},
+                        {"ChargeItemSantiago", "/E"},
+                        {"ChargeItemValue", item["EleBill"]},
+                    });
+                    info.Add(new Dictionary<String, Object>() { 
+                        {"SpaceID", item["SpaceID"]},
+                        {"Description", "Gas"},
+                        {"DueDate", dueDate},
+                        {"ChargeItemSantiago", "/G"},
+                        {"ChargeItemValue", item["GasBill"]},
+                    });
+                    info.Add(new Dictionary<String, Object>() { 
+                        {"SpaceID", item["SpaceID"]},
+                        {"Description", "Water"},
+                        {"DueDate", dueDate},
+                        {"ChargeItemSantiago", "/W"},
+                        {"ChargeItemValue", item["WatBill"]},
+                    });
                 }
-
-                List<Object[]> surcharge = calculateSurcharges(utilRateId, "All", numDays, usage);
-                surcharge.AddRange(calculateSurcharges(utilRateId, rateType, numDays, usage));
-                decimal surchargeTotal = 0.0M;
-                foreach (Object[] item in surcharge) {
-                    surchargeTotal += (decimal)item[1];
-                }
-
-                List<Object[]> tax = calculateTaxCost('G', new String[] { "LocalTax", "CountyTax", "StateTax", "RegTax" }, usage);
-                decimal taxTotal = 0.0M;
-                foreach (Object[] item in tax) {
-                    taxTotal += (decimal)item[1];
-                }
-
-                String careRates;
-                if (numMed > 0) { careRates = "CARE RATES APPLIED"; } else { careRates = ""; }
-                Object[] pdfGas = new Object[] { (baseline * numDays + numMed * medAllowance), custCharge, generation, generationTotal, 
-                surcharge, tax, careRates, (decimal)custCharge[1] + generationTotal + surchargeTotal + taxTotal };
-
-                return pdfGas;
+                CSVGenerator.santiagoFormat(santiago, info);
             }
+            MessageBox.Show("Collections file generated!");
+        }
 
-            public Object[] calculateEleTotalCost() {
-                int utilRateId, tierSetId, numDays, usage, numMed; char serviceType, season, zone; String rateType; decimal baseline, medAllowance;
-
-                int eleCompanyId = (int)DatabaseControl.getSingleRecord(new String[] { "ElectricityCompanyID" }, DatabaseControl.parkTable,
-                    "ParkID=@value0", new Object[] { parkId })[0];
-
-                Object[] utilCompany = DatabaseControl.getSingleRecord(new String[] { "UtilityRateID", "HasWinter", "WinterStartDate", "WinterEndDate", "TierSetID" }, DatabaseControl.utilRateTable,
-                    "UtilityCompanyID=@value0 ORDER BY UtilityRateID DESC", new Object[] { eleCompanyId });
-
-                utilRateId = (int)utilCompany[0];
-                tierSetId = (int)utilCompany[4];
-                if ((bool)utilCompany[1]) {
-                    DateTime winterStart = (DateTime)utilCompany[2];
-                    DateTime winterEnd = (DateTime)utilCompany[3];
-                    if (winterStart < DateTime.Today && winterEnd > DateTime.Today) { season = 'W'; } else { season = 'S'; }
-                } else {
-                    season = ' ';
-                }
-
-                zone = Convert.ToChar(DatabaseControl.getSingleRecord(new String[] { "EleZone" }, DatabaseControl.parkTable,
-                    "ParkID=@value0", new Object[] { parkId })[0]);
-                rateType = DatabaseControl.getSingleRecord(new String[] { "EleStatus" }, DatabaseControl.spaceTable,
-                    "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0].ToString();
-                if (rateType == "") { rateType = "Regular"; }
-                serviceType = Convert.ToChar(DatabaseControl.getSingleRecord(new String[] { "EleType" }, DatabaseControl.spaceTable,
-                    "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0]);
-                numMed = (int)DatabaseControl.getSingleRecord(new String[] { "MedStatus" }, DatabaseControl.spaceTable,
-                    "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0];
-
-                usage = (int)meterRead[4] - (int)meterRead[7];
-                numDays = (int)(((DateTime)meterRead[2]).Date - ((DateTime)meterRead[2]).Date).TotalDays + 1;
-                baseline = getBaselineAllowance(utilRateId, season, serviceType, zone);
-                medAllowance = getBaselineAllowance(utilRateId, 'M', 'M', 'M');
-
-                Console.WriteLine("Electric  \r\nUsage:{0}  Days:{1}  Baseline:{2}  MedAllowance:{3}", usage, numDays,
-                    (baseline * numDays + numMed * medAllowance).ToString("G29"), numMed);
-                Console.WriteLine("Status: {0}   Zone: {1}   Season: {2}  Service: {3}", rateType, zone, season, serviceType);
-                Console.WriteLine("PrevDate: {0}   CurrDate: {1}   PrevRead: {2}   CurrRead: {3}\r\n", ((DateTime)meterRead[2]).Date.ToShortDateString(), ((DateTime)meterRead[2]).Date.ToShortDateString(),
-                    meterRead[4], meterRead[7]);
-
-                Object[] custCharge = calculateBasicCost(utilRateId, serviceType, rateType, numDays);
-
-                List<Object[]> delivery = calculateTierCost(utilRateId, 'D', rateType, season, tierSetId, usage, baseline * numDays + numMed * medAllowance);
-                decimal deliveryTotal = 0.0M;
-                foreach (Object[] item in delivery) {
-                    deliveryTotal += (decimal)item[1];
-                }
-
-                List<Object[]> generation = calculateTierCost(utilRateId, 'G', rateType, season, tierSetId, usage, baseline * numDays + numMed * medAllowance);
-                decimal generationTotal = 0.0M;
-                foreach (Object[] item in generation) {
-                    generationTotal += (decimal)item[1];
-                }
-
-                List<Object[]> surcharge = calculateSurcharges(utilRateId, "All", numDays, usage);
-                surcharge.AddRange(calculateSurcharges(utilRateId, rateType, numDays, usage));
-                decimal surchargeTotal = 0.0M;
-                foreach (Object[] item in surcharge) {
-                    surchargeTotal += (decimal)item[1];
-                }
-
-                List<Object[]> tax = calculateTaxCost('E', new String[] { "LocalTax", "CountyTax", "StateTax", "RegTax" }, usage);
-                decimal taxTotal = 0.0M;
-                foreach (Object[] item in tax) {
-                    taxTotal += (decimal)item[1];
-                }
-
-                String careRates;
-                if (numMed > 0) { careRates = "CARE RATES APPLIED"; } else { careRates = ""; }
-                Object[] pdfEle = new Object[] { (baseline * numDays + numMed * medAllowance), custCharge, delivery, deliveryTotal, generation, generationTotal, 
-                surcharge, tax, careRates, (decimal)custCharge[1] + deliveryTotal + generationTotal + surchargeTotal + taxTotal };
-                return pdfEle;
+        private void TenantBill_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.S && e.Modifiers == Keys.Control) {
+                this.ActiveControl = spaceList;
+            } else if (e.KeyCode == Keys.Right && e.Modifiers == Keys.Control) {
+                this.ActiveControl = tempCharges;
+            } else if (e.KeyCode == Keys.Left && e.Modifiers == Keys.Control) {
+                this.ActiveControl = summaryOfCharges;
             }
+        }
 
-            public Object[] calculateWatTotalCost() {
-                int utilRateId, tierSetId, numDays, usage, numMed; char serviceType, season, zone; String rateType; decimal baseline, medAllowance;
+        private void tenantToolStripMenuItem_Click(object sender, EventArgs e) {
 
-                int watCompanyId = (int)DatabaseControl.getSingleRecord(new String[] { "WaterCompanyID" }, DatabaseControl.parkTable,
-                    "ParkID=@value0", new Object[] { parkId })[0];
+        }
 
-                Object[] utilCompany = DatabaseControl.getSingleRecord(new String[] { "UtilityRateID", "TierSetID" }, DatabaseControl.utilRateTable,
-                    "UtilityCompanyID=@value0 ORDER BY UtilityRateID DESC", new Object[] { watCompanyId });
-
-                utilRateId = (int)utilCompany[0];
-                tierSetId = (int)utilCompany[1];
-                season = ' ';
-
-                rateType = DatabaseControl.getSingleRecord(new String[] { "WatStatus" }, DatabaseControl.spaceTable,
-                    "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0].ToString();
-                if (rateType == "") { rateType = "Regular"; }
-                serviceType = 'W';
-                numMed = (int)DatabaseControl.getSingleRecord(new String[] { "MedStatus" }, DatabaseControl.spaceTable,
-                    "ParkSpaceID=@value0", new Object[] { parkSpaceId })[0];
-
-                usage = (int)meterRead[5] - (int)meterRead[8];
-                numDays = (int)(((DateTime)meterRead[2]).Date - ((DateTime)meterRead[2]).Date).TotalDays + 1;
-                baseline = getBaselineAllowance(utilRateId, 'S', serviceType, ' ');
-
-                Object[] custCharge = calculateBasicCost(utilRateId, serviceType, rateType, numDays);
-
-                List<Object[]> generation = calculateTierCost(utilRateId, 'G', rateType, season, tierSetId, usage, baseline * numDays);
-                decimal generationTotal = 0.0M;
-                foreach (Object[] item in generation) {
-                    generationTotal += (decimal)item[1];
-                }
-
-                List<Object[]> surcharge = calculateSurcharges(utilRateId, "All", numDays, usage);
-                surcharge.AddRange(calculateSurcharges(utilRateId, rateType, numDays, usage));
-                decimal surchargeTotal = 0.0M;
-                foreach (Object[] item in surcharge) {
-                    surchargeTotal += (decimal)item[1];
-                }
-
-                List<Object[]> tax = calculateTaxCost('E', new String[] { "LocalTax", "CountyTax", "StateTax", "RegTax" }, usage);
-                decimal taxTotal = 0.0M;
-                foreach (Object[] item in tax) {
-                    taxTotal += (decimal)item[1];
-                }
-
-                Object[] pdfWat = new Object[] { baseline * numDays, custCharge, generation, generationTotal, surcharge, tax, (decimal)custCharge[1] + generationTotal + surchargeTotal + taxTotal };
-                return pdfWat;
+        private void gasHistoryToolStripMenuItem_Click(object sender, EventArgs e) {
+            String[] fields = new String[] { "DueDate", "StartDate", "MeterReadDate", "GasReadValue" };
+            String condition = "ParkID=@value0 AND OrderID=@value1 ORDER BY DueDate DESC";
+            List<Object[]> readInfo = DatabaseControl.getMultipleRecord(fields, DatabaseControl.meterReadsTable, condition, new Object[] { parkId, orderId });
+            DateTime end = (DateTime)readInfo[0][2];
+            DateTime start;
+            if (readInfo.Count < 25) {
+                start = (DateTime)readInfo[readInfo.Count-1][1];
+            } else {
+                start = (DateTime)readInfo[24][1];
             }
-
-            public Object[] calculateBasicCost(int utilRateId, char serviceType, String rateType, int numDays) {
-                decimal rate = getBasicRate(utilRateId, rateType, serviceType);
-                return new Object[] { String.Format("Cust Charge: {0}x{1}", numDays, rate.ToString("G29")), numDays * rate };
+            List<Object[]> tenants = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID", "Tenant", "MoveInDate", "MoveOutDate" },
+                DatabaseControl.spaceTable, "ParkID=@value0 AND OrderID=@value1 AND MoveInDate>=@value2 AND (MoveOutDate<=@value3 OR MoveOutDate is NULL) ORDER BY MoveInDate DESC",
+                new Object[] { parkId, orderId, start, end });
+            List<Object[]> bills = new List<Object[]>();
+            foreach (Object[] tenant in tenants) {
+                List<Object[]> tempBills = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID", "DueDate", "GasUsage", "GasBill" }, DatabaseControl.spaceBillTable,
+                    "ParkSpaceID=@value0 ORDER BY DueDate DESC", new Object[] { tenant[0] });
+                foreach (Object[] temp in tempBills) {
+                    temp[0] = tenant[1];
+                    bills.Add(temp);
+                    if (bills.Count > 24) break;
+                }
+                if (bills.Count > 24) break;
             }
+            PdfControl.historyReport("Gas Report", parkInfo, orderId, bills, readInfo);
+        }
 
-            public List<Object[]> calculateTierCost(int utilRateId, char chargeType, String rateType, char season, int tierSetId, decimal usage, decimal baseline) {
-                List<Object[]> obj = new List<Object[]>();
-                //decimal totalCost = 0.0M;
-                for (int i = minTier; i <= maxTier; i++) {
-                    Object[] tierPercentages = getTierPercentage(tierSetId);
-                    decimal tierLimit = baseline * (decimal)tierPercentages[i];
-                    Object[] rate = getTierRate(utilRateId, chargeType, rateType, season);
-                    if (usage > tierLimit && (decimal)tierPercentages[i] != -1.00M) {
-                        //totalCost += ((decimal)rate[i-1] * tierLimit);
-                        usage -= tierLimit;
-                        obj.Add(new Object[] { String.Format("Tier{0}: {1}x{2}", i, tierLimit.ToString("G29"), ((decimal)rate[i - 1]).ToString("G29")), tierLimit * (decimal)rate[i - 1] });
-                    } else {
-                        //totalCost += ((decimal)rate[i-1] * usage);
-                        obj.Add(new Object[] { String.Format("Tier{0}: {1}x{2}", i, usage.ToString("G29"), ((decimal)rate[i - 1]).ToString("G29")), usage * (decimal)rate[i - 1] });
+        private void eleHistoryToolStripMenuItem_Click(object sender, EventArgs e) {
+            String[] fields = new String[] { "DueDate", "StartDate", "MeterReadDate", "EleReadValue" };
+            String condition = "ParkID=@value0 AND OrderID=@value1 ORDER BY DueDate DESC";
+            List<Object[]> readInfo = DatabaseControl.getMultipleRecord(fields, DatabaseControl.meterReadsTable, condition, new Object[] { parkId, orderId });
+            DateTime end = (DateTime)readInfo[0][2];
+            DateTime start;
+            if (readInfo.Count < 25) {
+                start = (DateTime)readInfo[readInfo.Count - 1][1];
+            } else {
+                start = (DateTime)readInfo[24][1];
+            }
+            List<Object[]> tenants = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID", "Tenant", "MoveInDate", "MoveOutDate" },
+                DatabaseControl.spaceTable, "ParkID=@value0 AND OrderID=@value1 AND MoveInDate>=@value2 AND (MoveOutDate<=@value3 OR MoveOutDate is NULL) ORDER BY MoveInDate DESC",
+                new Object[] { parkId, orderId, start, end });
+            List<Object[]> bills = new List<Object[]>();
+            foreach (Object[] tenant in tenants) {
+                List<Object[]> tempBills = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID", "DueDate", "EleUsage", "EleBill" }, DatabaseControl.spaceBillTable,
+                    "ParkSpaceID=@value0 ORDER BY DueDate DESC", new Object[] { tenant[0] });
+                foreach (Object[] temp in tempBills) {
+                    temp[0] = tenant[1];
+                    bills.Add(temp);
+                    if (bills.Count > 24) break;
+                }
+                if (bills.Count > 24) break;
+            }
+            PdfControl.historyReport("Electricty Report", parkInfo, orderId, bills, readInfo);
+        }
+
+        private void watHistoryToolStripMenuItem_Click(object sender, EventArgs e) {
+            String[] fields = new String[] { "DueDate", "StartDate", "MeterReadDate", "WatReadValue" };
+            String condition = "ParkID=@value0 AND OrderID=@value1 ORDER BY DueDate DESC";
+            List<Object[]> readInfo = DatabaseControl.getMultipleRecord(fields, DatabaseControl.meterReadsTable, condition, new Object[] { parkId, orderId });
+            DateTime end = (DateTime)readInfo[0][2];
+            DateTime start;
+            if (readInfo.Count < 25) {
+                start = (DateTime)readInfo[readInfo.Count - 1][1];
+            } else {
+                start = (DateTime)readInfo[24][1];
+            }
+            List<Object[]> tenants = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID", "Tenant", "MoveInDate", "MoveOutDate" },
+                DatabaseControl.spaceTable, "ParkID=@value0 AND OrderID=@value1 AND MoveInDate>=@value2 AND (MoveOutDate<=@value3 OR MoveOutDate is NULL) ORDER BY MoveInDate DESC",
+                new Object[] { parkId, orderId, start, end });
+            List<Object[]> bills = new List<Object[]>();
+            foreach (Object[] tenant in tenants) {
+                List<Object[]> tempBills = DatabaseControl.getMultipleRecord(new String[] { "ParkSpaceID", "DueDate", "WatUsage", "WatBill" }, DatabaseControl.spaceBillTable,
+                    "ParkSpaceID=@value0 ORDER BY DueDate DESC", new Object[] { tenant[0] });
+                foreach (Object[] temp in tempBills) {
+                    temp[0] = tenant[1];
+                    bills.Add(temp);
+                    if (bills.Count > 24) break;
+                }
+                if (bills.Count > 24) break;
+            }
+            PdfControl.historyReport("Water Report", parkInfo, orderId, bills, readInfo);
+        }
+
+        private void allHistoryToolStripMenuItem_Click(object sender, EventArgs e) {
+            watHistoryToolStripMenuItem_Click(sender, e);
+            eleHistoryToolStripMenuItem_Click(sender, e);
+            gasHistoryToolStripMenuItem_Click(sender, e);
+        }
+
+        private void readIssuesToolStripMenuItem_Click(object sender, EventArgs e) {
+            List<Object[]> gasIssues = new List<Object[]>();
+            List<Object[]> eleIssues = new List<Object[]>();
+            List<Object[]> watIssues = new List<Object[]>();
+
+            List<Object[]> spaces = DatabaseControl.getMultipleRecord(new String[] { "DISTINCT OrderID" }, DatabaseControl.spaceTable, "ParkID=@value0 Order BY OrderID", new Object[] { parkId });
+            Object[] period = DatabaseControl.getSingleRecord(new String[] { "DueDate" }, DatabaseControl.periodTable, "ParkID=@value0 ORDER BY DueDate DESC", new Object[] { parkId });
+            foreach (Object[] space in spaces) {
+                Object[] tenant = DatabaseControl.getSingleRecord(new String[] { "Tenant" }, DatabaseControl.spaceTable,
+                    "ParkID=@value0 AND OrderID=@value1 AND MoveOutDate IS NULL", new Object[] { parkId, space[0] });
+                List<Object[]> records = DatabaseControl.getMultipleRecord(DatabaseControl.meterReadsColumns, DatabaseControl.meterReadsTable, 
+                    "ParkID=@value0 AND OrderID=@value1 AND DueDate<=@value2 ORDER BY DueDate DESC", new Object[] { parkId, space[0], period[0] });
+                if (records.Count < 5) continue;
+                Object[] recent0 = records[0];
+                Object[] recent1  = records[1];
+                Object[] past0 = records[1];
+                Object[] past1 = records[4];
+                int month = ((DateTime)recent0[9]).Date.Month;
+                bool hasOneYear = false;
+                for (int i = 1; i < 25; i++) {
+                    int pastMonth = ((DateTime)records[i][9]).Date.Month;
+                    if (pastMonth == month && records.Count > i + 2) {
+                        past0 = records[i - 1];
+                        past1 = records[i + 2];
+                        hasOneYear = true;
                         break;
                     }
                 }
-                return obj;
-            }
 
-            public List<Object[]> calculateTaxCost(char utilType, String[] tax, decimal usage) {
-                List<Object[]> obj = new List<Object[]>();
-                //decimal total = 0.0M;
-                foreach (String taxType in tax) {
-                    decimal rate = getTaxRate(parkId, utilType, taxType);
-                    obj.Add(new Object[] { String.Format(taxType + " {0}x{1}", usage.ToString("G29"), rate.ToString("G29")), (usage * rate) });
-                    //total += usage * rate;
+                int currDays = (int)((DateTime)recent0[3] - (DateTime)recent1[3]).TotalDays;
+                int pastDays = (int)((DateTime)past0[3] - (DateTime)past1[3]).TotalDays;
+
+                double currGasUsage = (int)recent0[4] - (int)recent1[4];
+                double currEleUsage = (int)recent0[5] - (int)recent1[5];
+                double currWatUsage = (int)recent0[6] - (int)recent1[6];
+
+                double pastGasUsage = (int)past0[4] - (int)past1[4];
+                double pastEleUsage = (int)past0[5] - (int)past1[5];
+                double pastWatUsage = (int)past0[6] - (int)past1[6];
+
+                double comparisonValue = 0.5;
+                if (hasOneYear) comparisonValue = 0.25;
+
+                double currGasAvg = currGasUsage / currDays;
+                double currEleAvg = currEleUsage / currDays;
+                double currWatAvg = currWatUsage / currDays;
+
+                double pastGasAvg = pastGasUsage / pastDays;
+                double pastEleAvg = pastEleUsage / pastDays;
+                double pastWatAvg = pastWatUsage / pastDays;
+
+                if (currGasUsage >= 0 && Math.Abs((currGasAvg - pastGasAvg) / pastGasAvg) > comparisonValue) {
+                    gasIssues.Add(new Object[] { space[0], tenant[0], recent0[2], recent0[3], recent1[4], recent0[4], Math.Round(pastGasAvg, 3), Math.Round(currGasAvg, 3) });
                 }
-                return obj;
-            }
-
-            public List<Object[]> calculateSurcharges(int utilRateId, String rateType, int days, decimal quantity) {
-                List<Object[]> obj = new List<Object[]>();
-                ArrayList surcharges = getSurcharge(utilRateId, rateType);
-
-                foreach (Object[] surcharge in surcharges) {
-                    decimal rate = (decimal)surcharge[2];
-                    int usage = (int)surcharge[1];
-                    String description = surcharge[0].ToString();
-
-                    switch (usage) {
-                        case 1:
-                            obj.Add(new Object[] { description, rate });
-                            break;
-                        case 2:
-                            obj.Add(new Object[] { String.Format(description + " {0}x{1}", quantity.ToString("G29"), rate.ToString("G29")), quantity * rate });
-                            break;
-                        case 3:
-                            obj.Add(new Object[] { String.Format(description + " {0}x{1}", quantity.ToString("G29"), rate.ToString("G29")), days * rate });
-                            break;
-                    }
+                if (currEleUsage >= 0 && Math.Abs((currEleAvg - pastEleAvg) / pastEleAvg) > comparisonValue) {
+                    eleIssues.Add(new Object[] { space[0], tenant[0], recent0[2], recent0[3], recent1[5], recent0[5], Math.Round(pastEleAvg, 3), Math.Round(currEleAvg, 3) });
                 }
-                return obj;
+                if (currWatUsage >= 0 && Math.Abs((currWatAvg - pastWatAvg) / pastWatAvg) > comparisonValue) {
+                    watIssues.Add(new Object[] { space[0], tenant[0], recent0[2], recent0[3], recent1[6], recent0[6], Math.Round(pastWatAvg, 3), Math.Round(currWatAvg, 3) });
+                }
             }
-
-            private decimal getBaselineAllowance(int utilRateId, char season, char serviceType, char zone) {
-                String condition = "UtilityRateID=@value0 AND Season=@value1 AND ServiceType=@value2 AND ClimateZone=@value3";
-                Object[] values = { utilRateId, season, serviceType, zone };
-                return (decimal)DatabaseControl.getSingleRecord(new String[] { "BaselineAllowanceRate" }, DatabaseControl.baselineAllowanceTable, condition, values)[0];
-            }
-
-            private Object[] getTierPercentage(int tierSetId) {
-                return DatabaseControl.getSingleRecord(new String[] { "TierSetName", "Tier1", "Tier2", "Tier3", "Tier4", "Tier5" }, DatabaseControl.tierTable, "TierSetID=@value0",
-                    new Object[] { tierSetId });
-            }
-
-            private decimal getBasicRate(int utilRateId, String status, char service) {
-                String condition = "UtilityRateID=@value0 AND Status=@value1 AND Service=@value2";
-                Object[] values = { utilRateId, status, service };
-                return (decimal)DatabaseControl.getSingleRecord(new String[] { "Rate" }, DatabaseControl.utilBasicRatesTable, condition, values)[0];
-            }
-
-            private String getBasicDescription(int utilRateId, char serviceType, String rateType) {
-                String condition = "UtilityRateID=@value0 AND ServiceType=@value1 AND RateType=@value2";
-                Object[] values = { utilRateId, serviceType, rateType };
-                return DatabaseControl.getSingleRecord(new String[] { "Description" }, DatabaseControl.utilBasicRatesTable, condition, values)[0].ToString();
-            }
-
-            private ArrayList getSurcharge(int utilRateId, String rateType) {
-                String condition = "UtilityRateID=@value0 AND RateType=@value1";
-                Object[] values = { utilRateId, rateType };
-                return DatabaseControl.getMultipleRecord(new String[] { "Description", "Usage", "Rate" }, DatabaseControl.utilSurchargeTable, condition, values);
-            }
-
-            private Object[] getTierRate(int utilRateId, char chargeType, String rateType, char season) {
-                String condition = "UtilityRateID=@value0 AND ChargeType=@value1 AND RateType=@value2 AND Season=@value3";
-                Object[] values = { utilRateId, chargeType, rateType, season };
-                return DatabaseControl.getSingleRecord(new String[] { "Rate1", "Rate2", "Rate3", "Rate4", "Rate5" },
-                    DatabaseControl.utilTierRatesTable, condition, values);
-            }
-
-            private decimal getTaxRate(int parkId, char utilType, String tax) {
-                return Convert.ToDecimal(DatabaseControl.getSingleRecord(new String[] { tax }, DatabaseControl.taxTable,
-                    "ParkID=@value0 AND UtilityType=@value1 ORDER BY TaxRateID DESC", new Object[] { parkId, utilType })[0]);
-            }
+            PdfControl.readIssues(parkInfo, (DateTime)period[0], gasIssues, eleIssues, watIssues);
         }
+
     }
 }

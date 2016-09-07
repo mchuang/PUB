@@ -1,52 +1,73 @@
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUB\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.exe.config
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUB\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.exe
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUB\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.pdb
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.csprojResolveAssemblyReference.cache
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.csproj.GenerateResource.Cache
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\WindowsFormsApplication3.exe
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\WindowsFormsApplication3.pdb
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.MainMenu.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.ParkInfo.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.Properties.Resources.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.Setup.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.TenantInfo.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.UserSettings.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.OwnerInfo.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.MeterReads.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.number.resources
-C:\Users\MichaelChuang\documents\visual studio 2012\Projects\PUB\WindowsFormsApplication3\obj\Debug\PUB.UtilityGas.resources
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.exe.config
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\WindowsFormsApplication3.exe
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\WindowsFormsApplication3.pdb
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.exe
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.pdb
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\bin\Debug\Meterman.exe.config
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\bin\Debug\Meterman.exe
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\bin\Debug\Meterman.pdb
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\bin\Debug\Microsoft.VisualBasic.PowerPacks.Vs.dll
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\bin\Debug\Microsoft.VisualBasic.PowerPacks.Vs.xml
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.DataMigration.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.DisableUserForm.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.ImportMeterReadFile.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.Login.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.MeterReads.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.MoveOut.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.NewUserForm.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.OwnerInfo.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.MainMenu.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.ParkInfo.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.Properties.Resources.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.ReadHistory.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.ResetPasswordForm.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.SelectDate.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.SelectStatus.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.ParkSpaceInfo.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.TenantBill.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.TenantInfo.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.TierInfo.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.UtilityElectricity0.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.UtilityElectricity1.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.UtilityGas0.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.UtilityGas1.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.UtilityWater.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.ViewUtilityRateForm.resources
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.csproj.GenerateResource.Cache
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\Meterman.exe
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\Meterman.pdb
+C:\Users\michaelc\Documents\Pac Comm\meterman\WindowsFormsApplication3\obj\Debug\PUB.csprojResolveAssemblyReference.cache
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\Meterman.exe.config
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\Meterman.exe
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\Meterman.pdb
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\Microsoft.VisualBasic.PowerPacks.Vs.dll
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\PdfSharp.dll
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\Microsoft.VisualBasic.PowerPacks.Vs.xml
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\PdfSharp.pdb
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\PdfSharp.xml
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\de\PdfSharp.resources.dll
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.DataMigration.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.DisableUserForm.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ImportMeterReadFile.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.Login.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.MeterReads.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.MoveOut.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.NewUserForm.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.OwnerInfo.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.MainMenu.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ParkInfo.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.Properties.Resources.resources
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.Setup.resources
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.TenantInfo.resources
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.UserSettings.resources
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.csproj.GenerateResource.Cache
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ReadHistory.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ResetPasswordForm.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.SelectDate.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.SelectStatus.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ParkSpaceInfo.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.TenantBill.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.TenantInfo.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.TierInfo.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.UtilityElectricity0.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.UtilityElectricity1.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.UtilityGas0.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.UtilityGas1.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.UtilityWater.resources
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.MoveOut.resources
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\Microsoft.VisualBasic.PowerPacks.Vs.dll
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\Microsoft.VisualBasic.PowerPacks.Vs.xml
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\PdfSharp.dll
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\PdfSharp.pdb
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\PdfSharp.xml
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\bin\Debug\de\PdfSharp.resources.dll
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.TenantBill.resources
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.TierInfo.resources
-C:\Users\michaelc\Documents\Pac Comm\meterman-new\WindowsFormsApplication3\bin\Debug\WindowsFormsApplication3.exe.config
-C:\Users\michaelc\Documents\Pac Comm\meterman-new\WindowsFormsApplication3\obj\Debug\WindowsFormsApplication3.exe
-C:\Users\michaelc\Documents\Pac Comm\meterman-new\WindowsFormsApplication3\obj\Debug\WindowsFormsApplication3.pdb
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ImportMeterReadFile.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ViewUtilityRateForm.resources
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.csproj.GenerateResource.Cache
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\Meterman.exe
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\Meterman.pdb
+C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ManualMeterReadInput.resources
 C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.csprojResolveAssemblyReference.cache
-C:\Users\MichaelChuang\Documents\Visual Studio 2012\Projects\PUBSVNwc\WindowsFormsApplication3\obj\Debug\PUB.ReadHistory.resources

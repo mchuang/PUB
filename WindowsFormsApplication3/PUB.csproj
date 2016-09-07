@@ -8,9 +8,10 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PUB</RootNamespace>
-    <AssemblyName>WindowsFormsApplication3</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AssemblyName>Meterman</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -21,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
@@ -52,6 +55,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BillCalculation.cs" />
+    <Compile Include="CSVGenerator.cs" />
+    <Compile Include="DataMigration.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataMigration.Designer.cs">
+      <DependentUpon>DataMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Db1.cs" />
+    <Compile Include="DisableUserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DisableUserForm.Designer.cs">
+      <DependentUpon>DisableUserForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Impl1.cs" />
+    <Compile Include="Index1.cs" />
+    <Compile Include="Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ManualMeterReadInput.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ManualMeterReadInput.Designer.cs">
+      <DependentUpon>ManualMeterReadInput.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NewUserForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewUserForm.Designer.cs">
+      <DependentUpon>NewUserForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ParkReport.cs" />
     <Compile Include="PdfControl.cs" />
     <Compile Include="ReadHistory.cs">
       <SubType>Form</SubType>
@@ -91,7 +130,6 @@
     <Compile Include="MainMenu.Designer.cs">
       <DependentUpon>MainMenu.cs</DependentUpon>
     </Compile>
-    <Compile Include="ParkBilling.cs" />
     <Compile Include="ParkInfo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -100,11 +138,24 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Setup.cs">
+    <Compile Include="ResetPasswordForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Setup.Designer.cs">
-      <DependentUpon>Setup.cs</DependentUpon>
+    <Compile Include="ResetPasswordForm.Designer.cs">
+      <DependentUpon>ResetPasswordForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SantiagoCodes.cs" />
+    <Compile Include="SelectDate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectDate.Designer.cs">
+      <DependentUpon>SelectDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SelectStatus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SelectStatus.Designer.cs">
+      <DependentUpon>SelectStatus.cs</DependentUpon>
     </Compile>
     <Compile Include="ParkSpaceInfo.cs">
       <SubType>Form</SubType>
@@ -129,12 +180,6 @@
     </Compile>
     <Compile Include="TierInfo.Designer.cs">
       <DependentUpon>TierInfo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="UserSettings.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="UserSettings.Designer.cs">
-      <DependentUpon>UserSettings.cs</DependentUpon>
     </Compile>
     <Compile Include="UtilityElectricity0.cs">
       <SubType>Form</SubType>
@@ -166,14 +211,35 @@
     <Compile Include="UtilityWater.Designer.cs">
       <DependentUpon>UtilityWater.cs</DependentUpon>
     </Compile>
+    <Compile Include="ViewUtilityRate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ViewUtilityRate.Designer.cs">
+      <DependentUpon>ViewUtilityRate.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="DataMigration.resx">
+      <DependentUpon>DataMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DisableUserForm.resx">
+      <DependentUpon>DisableUserForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ImportMeterReadFile.resx">
       <DependentUpon>ImportMeterReadFile.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ManualMeterReadInput.resx">
+      <DependentUpon>ManualMeterReadInput.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MeterReads.resx">
       <DependentUpon>MeterReads.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MoveOut.resx">
       <DependentUpon>MoveOut.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewUserForm.resx">
+      <DependentUpon>NewUserForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OwnerInfo.resx">
       <DependentUpon>OwnerInfo.cs</DependentUpon>
@@ -197,8 +263,14 @@
     <EmbeddedResource Include="ReadHistory.resx">
       <DependentUpon>ReadHistory.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Setup.resx">
-      <DependentUpon>Setup.cs</DependentUpon>
+    <EmbeddedResource Include="ResetPasswordForm.resx">
+      <DependentUpon>ResetPasswordForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectDate.resx">
+      <DependentUpon>SelectDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SelectStatus.resx">
+      <DependentUpon>SelectStatus.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ParkSpaceInfo.resx">
       <DependentUpon>ParkSpaceInfo.cs</DependentUpon>
@@ -211,9 +283,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TierInfo.resx">
       <DependentUpon>TierInfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="UserSettings.resx">
-      <DependentUpon>UserSettings.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="UtilityElectricity0.resx">
       <DependentUpon>UtilityElectricity0.cs</DependentUpon>
@@ -230,6 +299,10 @@
     <EmbeddedResource Include="UtilityWater.resx">
       <DependentUpon>UtilityWater.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ViewUtilityRate.resx">
+      <DependentUpon>ViewUtilityRate.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

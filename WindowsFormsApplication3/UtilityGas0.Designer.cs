@@ -28,10 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.winterStartDate = new System.Windows.Forms.DateTimePicker();
-            this.label3 = new System.Windows.Forms.Label();
-            this.winterEndDate = new System.Windows.Forms.DateTimePicker();
-            this.label5 = new System.Windows.Forms.Label();
             this.measure = new System.Windows.Forms.ComboBox();
             this.method = new System.Windows.Forms.ComboBox();
             this.effDate = new System.Windows.Forms.DateTimePicker();
@@ -43,7 +39,6 @@
             this.nextBtn = new System.Windows.Forms.Button();
             this.saveBtn = new System.Windows.Forms.Button();
             this.cancelBtn = new System.Windows.Forms.Button();
-            this.hasWinter = new System.Windows.Forms.CheckBox();
             this.label17 = new System.Windows.Forms.Label();
             this.tierRatesInput = new System.Windows.Forms.TableLayoutPanel();
             this.textBox6 = new System.Windows.Forms.TextBox();
@@ -80,56 +75,25 @@
             this.label13 = new System.Windows.Forms.Label();
             this.label11 = new System.Windows.Forms.Label();
             this.tierSetId = new System.Windows.Forms.ComboBox();
+            this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.displayRateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.prevEffDates = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.tierRatesInput.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // winterStartDate
-            // 
-            this.winterStartDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.winterStartDate.Location = new System.Drawing.Point(597, 27);
-            this.winterStartDate.Name = "winterStartDate";
-            this.winterStartDate.Size = new System.Drawing.Size(97, 20);
-            this.winterStartDate.TabIndex = 32;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(562, 33);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(29, 13);
-            this.label3.TabIndex = 31;
-            this.label3.Text = "Start";
-            // 
-            // winterEndDate
-            // 
-            this.winterEndDate.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.winterEndDate.Location = new System.Drawing.Point(597, 53);
-            this.winterEndDate.Name = "winterEndDate";
-            this.winterEndDate.Size = new System.Drawing.Size(97, 20);
-            this.winterEndDate.TabIndex = 34;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(565, 59);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(26, 13);
-            this.label5.TabIndex = 33;
-            this.label5.Text = "End";
             // 
             // measure
             // 
             this.measure.FormattingEnabled = true;
             this.measure.Items.AddRange(new object[] {
             "Cubic Feet"});
-            this.measure.Location = new System.Drawing.Point(236, 66);
+            this.measure.Location = new System.Drawing.Point(236, 63);
             this.measure.Name = "measure";
             this.measure.Size = new System.Drawing.Size(101, 21);
-            this.measure.TabIndex = 54;
+            this.measure.TabIndex = 4;
             this.measure.Text = "Cubic Feet";
             // 
             // method
@@ -143,7 +107,7 @@
             this.method.Location = new System.Drawing.Point(63, 63);
             this.method.Name = "method";
             this.method.Size = new System.Drawing.Size(101, 21);
-            this.method.TabIndex = 53;
+            this.method.TabIndex = 3;
             // 
             // effDate
             // 
@@ -151,7 +115,8 @@
             this.effDate.Location = new System.Drawing.Point(446, 24);
             this.effDate.Name = "effDate";
             this.effDate.Size = new System.Drawing.Size(101, 20);
-            this.effDate.TabIndex = 52;
+            this.effDate.TabIndex = 2;
+            this.effDate.ValueChanged += new System.EventHandler(this.effDate_ValueChanged);
             // 
             // label1
             // 
@@ -188,7 +153,7 @@
             this.utilNameList.Location = new System.Drawing.Point(63, 23);
             this.utilNameList.Name = "utilNameList";
             this.utilNameList.Size = new System.Drawing.Size(321, 21);
-            this.utilNameList.TabIndex = 158;
+            this.utilNameList.TabIndex = 1;
             this.utilNameList.SelectedIndexChanged += new System.EventHandler(this.utilNameList_SelectedIndexChanged);
             // 
             // label6
@@ -205,7 +170,7 @@
             this.nextBtn.Location = new System.Drawing.Point(432, 303);
             this.nextBtn.Name = "nextBtn";
             this.nextBtn.Size = new System.Drawing.Size(128, 35);
-            this.nextBtn.TabIndex = 229;
+            this.nextBtn.TabIndex = 40;
             this.nextBtn.Text = "Allowance";
             this.nextBtn.UseVisualStyleBackColor = true;
             this.nextBtn.Click += new System.EventHandler(this.nextBtn_Click);
@@ -215,7 +180,7 @@
             this.saveBtn.Location = new System.Drawing.Point(566, 303);
             this.saveBtn.Name = "saveBtn";
             this.saveBtn.Size = new System.Drawing.Size(128, 35);
-            this.saveBtn.TabIndex = 228;
+            this.saveBtn.TabIndex = 41;
             this.saveBtn.Text = "Commit";
             this.saveBtn.UseVisualStyleBackColor = true;
             this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
@@ -225,21 +190,10 @@
             this.cancelBtn.Location = new System.Drawing.Point(700, 303);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(128, 35);
-            this.cancelBtn.TabIndex = 227;
+            this.cancelBtn.TabIndex = 42;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
-            // 
-            // hasWinter
-            // 
-            this.hasWinter.AutoSize = true;
-            this.hasWinter.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.hasWinter.Location = new System.Drawing.Point(597, 5);
-            this.hasWinter.Name = "hasWinter";
-            this.hasWinter.Size = new System.Drawing.Size(96, 17);
-            this.hasWinter.TabIndex = 233;
-            this.hasWinter.Text = "Winter Season";
-            this.hasWinter.UseVisualStyleBackColor = true;
             // 
             // label17
             // 
@@ -259,7 +213,7 @@
             this.tierRatesInput.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tierRatesInput.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tierRatesInput.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.tierRatesInput.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
+            this.tierRatesInput.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 101F));
             this.tierRatesInput.Controls.Add(this.textBox6, 3, 0);
             this.tierRatesInput.Controls.Add(this.textBox10, 2, 0);
             this.tierRatesInput.Controls.Add(this.textBox18, 5, 0);
@@ -278,7 +232,7 @@
             this.textBox6.Location = new System.Drawing.Point(303, 3);
             this.textBox6.Name = "textBox6";
             this.textBox6.Size = new System.Drawing.Size(94, 20);
-            this.textBox6.TabIndex = 72;
+            this.textBox6.TabIndex = 33;
             this.textBox6.Text = "0.0000";
             // 
             // textBox10
@@ -286,7 +240,7 @@
             this.textBox10.Location = new System.Drawing.Point(203, 3);
             this.textBox10.Name = "textBox10";
             this.textBox10.Size = new System.Drawing.Size(94, 20);
-            this.textBox10.TabIndex = 73;
+            this.textBox10.TabIndex = 32;
             this.textBox10.Text = "0.0000";
             // 
             // textBox18
@@ -294,7 +248,7 @@
             this.textBox18.Location = new System.Drawing.Point(503, 3);
             this.textBox18.Name = "textBox18";
             this.textBox18.Size = new System.Drawing.Size(94, 20);
-            this.textBox18.TabIndex = 71;
+            this.textBox18.TabIndex = 35;
             this.textBox18.Text = "0.0000";
             // 
             // textBox22
@@ -302,7 +256,7 @@
             this.textBox22.Location = new System.Drawing.Point(403, 3);
             this.textBox22.Name = "textBox22";
             this.textBox22.Size = new System.Drawing.Size(94, 20);
-            this.textBox22.TabIndex = 104;
+            this.textBox22.TabIndex = 34;
             this.textBox22.Text = "0.0000";
             // 
             // textBox23
@@ -310,7 +264,7 @@
             this.textBox23.Location = new System.Drawing.Point(103, 3);
             this.textBox23.Name = "textBox23";
             this.textBox23.Size = new System.Drawing.Size(94, 20);
-            this.textBox23.TabIndex = 70;
+            this.textBox23.TabIndex = 31;
             this.textBox23.Text = "0.0000";
             // 
             // tierStatus
@@ -319,8 +273,7 @@
             this.tierStatus.Location = new System.Drawing.Point(3, 3);
             this.tierStatus.Name = "tierStatus";
             this.tierStatus.Size = new System.Drawing.Size(94, 21);
-            this.tierStatus.TabIndex = 182;
-            this.tierStatus.Text = "Regular";
+            this.tierStatus.TabIndex = 30;
             this.tierStatus.SelectedIndexChanged += new System.EventHandler(this.tierStatus_SelectedIndexChanged);
             // 
             // label35
@@ -370,40 +323,40 @@
             // 
             // removeTierBtn
             // 
-            this.removeTierBtn.Location = new System.Drawing.Point(730, 228);
+            this.removeTierBtn.Location = new System.Drawing.Point(728, 228);
             this.removeTierBtn.Name = "removeTierBtn";
             this.removeTierBtn.Size = new System.Drawing.Size(100, 23);
-            this.removeTierBtn.TabIndex = 242;
+            this.removeTierBtn.TabIndex = 37;
             this.removeTierBtn.Text = "Remove";
             this.removeTierBtn.UseVisualStyleBackColor = true;
             this.removeTierBtn.Click += new System.EventHandler(this.removeTierBtn_Click);
             // 
             // saveTierBtn
             // 
-            this.saveTierBtn.Location = new System.Drawing.Point(624, 229);
+            this.saveTierBtn.Location = new System.Drawing.Point(622, 229);
             this.saveTierBtn.Name = "saveTierBtn";
             this.saveTierBtn.Size = new System.Drawing.Size(100, 23);
-            this.saveTierBtn.TabIndex = 241;
+            this.saveTierBtn.TabIndex = 36;
             this.saveTierBtn.Text = "Store";
             this.saveTierBtn.UseVisualStyleBackColor = true;
             this.saveTierBtn.Click += new System.EventHandler(this.saveTierBtn_Click);
             // 
             // removeSurBtn
             // 
-            this.removeSurBtn.Location = new System.Drawing.Point(522, 179);
+            this.removeSurBtn.Location = new System.Drawing.Point(728, 180);
             this.removeSurBtn.Name = "removeSurBtn";
             this.removeSurBtn.Size = new System.Drawing.Size(100, 23);
-            this.removeSurBtn.TabIndex = 250;
+            this.removeSurBtn.TabIndex = 24;
             this.removeSurBtn.Text = "Remove";
             this.removeSurBtn.UseVisualStyleBackColor = true;
             this.removeSurBtn.Click += new System.EventHandler(this.removeSurBtn_Click);
             // 
             // saveSurBtn
             // 
-            this.saveSurBtn.Location = new System.Drawing.Point(416, 178);
+            this.saveSurBtn.Location = new System.Drawing.Point(622, 180);
             this.saveSurBtn.Name = "saveSurBtn";
             this.saveSurBtn.Size = new System.Drawing.Size(100, 23);
-            this.saveSurBtn.TabIndex = 249;
+            this.saveSurBtn.TabIndex = 23;
             this.saveSurBtn.Text = "Store";
             this.saveSurBtn.UseVisualStyleBackColor = true;
             this.saveSurBtn.Click += new System.EventHandler(this.saveSurBtn_Click);
@@ -468,7 +421,8 @@
             this.usageSurcharge.Location = new System.Drawing.Point(203, 3);
             this.usageSurcharge.Name = "usageSurcharge";
             this.usageSurcharge.Size = new System.Drawing.Size(94, 21);
-            this.usageSurcharge.TabIndex = 190;
+            this.usageSurcharge.TabIndex = 22;
+            this.usageSurcharge.SelectedIndexChanged += new System.EventHandler(this.usageSurcharge_SelectedIndexChanged);
             // 
             // statusSurcharge
             // 
@@ -476,7 +430,7 @@
             this.statusSurcharge.Location = new System.Drawing.Point(103, 3);
             this.statusSurcharge.Name = "statusSurcharge";
             this.statusSurcharge.Size = new System.Drawing.Size(94, 21);
-            this.statusSurcharge.TabIndex = 183;
+            this.statusSurcharge.TabIndex = 21;
             this.statusSurcharge.SelectedIndexChanged += new System.EventHandler(this.statusSurcharge_SelectedIndexChanged);
             // 
             // rateSurcharge
@@ -493,7 +447,7 @@
             this.descSurcharge.Location = new System.Drawing.Point(3, 3);
             this.descSurcharge.Name = "descSurcharge";
             this.descSurcharge.Size = new System.Drawing.Size(94, 21);
-            this.descSurcharge.TabIndex = 182;
+            this.descSurcharge.TabIndex = 20;
             this.descSurcharge.SelectedIndexChanged += new System.EventHandler(this.descSurcharge_SelectedIndexChanged);
             // 
             // label10
@@ -507,20 +461,20 @@
             // 
             // removeCustBtn
             // 
-            this.removeCustBtn.Location = new System.Drawing.Point(424, 130);
+            this.removeCustBtn.Location = new System.Drawing.Point(728, 133);
             this.removeCustBtn.Name = "removeCustBtn";
             this.removeCustBtn.Size = new System.Drawing.Size(100, 23);
-            this.removeCustBtn.TabIndex = 256;
+            this.removeCustBtn.TabIndex = 10;
             this.removeCustBtn.Text = "Remove";
             this.removeCustBtn.UseVisualStyleBackColor = true;
             this.removeCustBtn.Click += new System.EventHandler(this.removeCustBtn_Click);
             // 
             // saveCustBtn
             // 
-            this.saveCustBtn.Location = new System.Drawing.Point(318, 130);
+            this.saveCustBtn.Location = new System.Drawing.Point(622, 133);
             this.saveCustBtn.Name = "saveCustBtn";
             this.saveCustBtn.Size = new System.Drawing.Size(100, 23);
-            this.saveCustBtn.TabIndex = 255;
+            this.saveCustBtn.TabIndex = 9;
             this.saveCustBtn.Text = "Store";
             this.saveCustBtn.UseVisualStyleBackColor = true;
             this.saveCustBtn.Click += new System.EventHandler(this.saveCustBtn_Click);
@@ -547,7 +501,7 @@
             this.serviceType.Location = new System.Drawing.Point(103, 3);
             this.serviceType.Name = "serviceType";
             this.serviceType.Size = new System.Drawing.Size(94, 21);
-            this.serviceType.TabIndex = 204;
+            this.serviceType.TabIndex = 7;
             this.serviceType.SelectedIndexChanged += new System.EventHandler(this.serviceType_SelectedIndexChanged);
             // 
             // statusCustCharge
@@ -556,7 +510,7 @@
             this.statusCustCharge.Location = new System.Drawing.Point(3, 3);
             this.statusCustCharge.Name = "statusCustCharge";
             this.statusCustCharge.Size = new System.Drawing.Size(94, 21);
-            this.statusCustCharge.TabIndex = 198;
+            this.statusCustCharge.TabIndex = 6;
             this.statusCustCharge.SelectedIndexChanged += new System.EventHandler(this.statusCustCharge_SelectedIndexChanged);
             // 
             // custChargeRate
@@ -564,7 +518,7 @@
             this.custChargeRate.Location = new System.Drawing.Point(203, 3);
             this.custChargeRate.Name = "custChargeRate";
             this.custChargeRate.Size = new System.Drawing.Size(94, 20);
-            this.custChargeRate.TabIndex = 70;
+            this.custChargeRate.TabIndex = 8;
             this.custChargeRate.Text = "0.0000";
             // 
             // label13
@@ -580,7 +534,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(642, 116);
+            this.label11.Location = new System.Drawing.Point(391, 69);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(44, 13);
             this.label11.TabIndex = 259;
@@ -589,16 +543,55 @@
             // tierSetId
             // 
             this.tierSetId.FormattingEnabled = true;
-            this.tierSetId.Location = new System.Drawing.Point(645, 132);
+            this.tierSetId.Location = new System.Drawing.Point(446, 63);
             this.tierSetId.Name = "tierSetId";
             this.tierSetId.Size = new System.Drawing.Size(104, 21);
-            this.tierSetId.TabIndex = 258;
+            this.tierSetId.TabIndex = 5;
+            // 
+            // menuStrip1
+            // 
+            this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.displayRateToolStripMenuItem});
+            this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+            this.menuStrip1.Name = "menuStrip1";
+            this.menuStrip1.Size = new System.Drawing.Size(842, 24);
+            this.menuStrip1.TabIndex = 260;
+            this.menuStrip1.Text = "menuStrip1";
+            // 
+            // displayRateToolStripMenuItem
+            // 
+            this.displayRateToolStripMenuItem.Name = "displayRateToolStripMenuItem";
+            this.displayRateToolStripMenuItem.Size = new System.Drawing.Size(83, 20);
+            this.displayRateToolStripMenuItem.Text = "Display Rate";
+            this.displayRateToolStripMenuItem.Visible = false;
+            this.displayRateToolStripMenuItem.Click += new System.EventHandler(this.displayRateToolStripMenuItem_Click);
+            // 
+            // prevEffDates
+            // 
+            this.prevEffDates.FormattingEnabled = true;
+            this.prevEffDates.Location = new System.Drawing.Point(689, 24);
+            this.prevEffDates.Margin = new System.Windows.Forms.Padding(2);
+            this.prevEffDates.Name = "prevEffDates";
+            this.prevEffDates.Size = new System.Drawing.Size(92, 21);
+            this.prevEffDates.TabIndex = 261;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(608, 27);
+            this.label3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(79, 13);
+            this.label3.TabIndex = 262;
+            this.label3.Text = "Prev Eff. Dates";
             // 
             // UtilityGas0
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(842, 363);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.prevEffDates);
             this.Controls.Add(this.label11);
             this.Controls.Add(this.tierSetId);
             this.Controls.Add(this.label10);
@@ -622,7 +615,6 @@
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label33);
             this.Controls.Add(this.label8);
-            this.Controls.Add(this.hasWinter);
             this.Controls.Add(this.nextBtn);
             this.Controls.Add(this.saveBtn);
             this.Controls.Add(this.cancelBtn);
@@ -634,12 +626,11 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.winterEndDate);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.winterStartDate);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.menuStrip1);
+            this.MainMenuStrip = this.menuStrip1;
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "UtilityGas0";
-            this.Text = "Utility Gas";
+            this.Text = "UtilityGas";
             this.Load += new System.EventHandler(this.UtilityGas_Load);
             this.tierRatesInput.ResumeLayout(false);
             this.tierRatesInput.PerformLayout();
@@ -647,6 +638,8 @@
             this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            this.menuStrip1.ResumeLayout(false);
+            this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -654,10 +647,6 @@
 
         #endregion
 
-        private System.Windows.Forms.DateTimePicker winterStartDate;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.DateTimePicker winterEndDate;
-        private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox measure;
         private System.Windows.Forms.ComboBox method;
         private System.Windows.Forms.DateTimePicker effDate;
@@ -669,7 +658,6 @@
         private System.Windows.Forms.Button nextBtn;
         private System.Windows.Forms.Button saveBtn;
         private System.Windows.Forms.Button cancelBtn;
-        private System.Windows.Forms.CheckBox hasWinter;
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.TableLayoutPanel tierRatesInput;
         private System.Windows.Forms.ComboBox tierStatus;
@@ -706,6 +694,10 @@
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.ComboBox tierSetId;
+        private System.Windows.Forms.MenuStrip menuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem displayRateToolStripMenuItem;
+        private System.Windows.Forms.ComboBox prevEffDates;
+        private System.Windows.Forms.Label label3;
 
     }
 }

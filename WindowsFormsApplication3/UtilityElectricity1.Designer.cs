@@ -56,8 +56,6 @@
             this.label29 = new System.Windows.Forms.Label();
             this.label30 = new System.Windows.Forms.Label();
             this.label31 = new System.Windows.Forms.Label();
-            this.seasonBox = new System.Windows.Forms.ComboBox();
-            this.label9 = new System.Windows.Forms.Label();
             this.cancelBtn = new System.Windows.Forms.Button();
             this.saveBtn = new System.Windows.Forms.Button();
             this.label33 = new System.Windows.Forms.Label();
@@ -121,7 +119,7 @@
             this.medical.Location = new System.Drawing.Point(124, 349);
             this.medical.Name = "medical";
             this.medical.Size = new System.Drawing.Size(100, 20);
-            this.medical.TabIndex = 211;
+            this.medical.TabIndex = 40;
             // 
             // label12
             // 
@@ -236,7 +234,7 @@
             this.textBox29.Location = new System.Drawing.Point(3, 228);
             this.textBox29.Name = "textBox29";
             this.textBox29.Size = new System.Drawing.Size(94, 20);
-            this.textBox29.TabIndex = 197;
+            this.textBox29.TabIndex = 10;
             this.textBox29.Text = "0000.00";
             // 
             // textBox16
@@ -244,7 +242,7 @@
             this.textBox16.Location = new System.Drawing.Point(3, 153);
             this.textBox16.Name = "textBox16";
             this.textBox16.Size = new System.Drawing.Size(94, 20);
-            this.textBox16.TabIndex = 195;
+            this.textBox16.TabIndex = 7;
             this.textBox16.Text = "0000.00";
             // 
             // textBox17
@@ -252,7 +250,7 @@
             this.textBox17.Location = new System.Drawing.Point(3, 203);
             this.textBox17.Name = "textBox17";
             this.textBox17.Size = new System.Drawing.Size(94, 20);
-            this.textBox17.TabIndex = 194;
+            this.textBox17.TabIndex = 9;
             this.textBox17.Text = "0000.00";
             // 
             // textBox18
@@ -260,7 +258,7 @@
             this.textBox18.Location = new System.Drawing.Point(3, 178);
             this.textBox18.Name = "textBox18";
             this.textBox18.Size = new System.Drawing.Size(94, 20);
-            this.textBox18.TabIndex = 193;
+            this.textBox18.TabIndex = 8;
             this.textBox18.Text = "0000.00";
             // 
             // textBox19
@@ -268,7 +266,7 @@
             this.textBox19.Location = new System.Drawing.Point(3, 78);
             this.textBox19.Name = "textBox19";
             this.textBox19.Size = new System.Drawing.Size(94, 20);
-            this.textBox19.TabIndex = 189;
+            this.textBox19.TabIndex = 4;
             this.textBox19.Text = "0000.00";
             // 
             // textBox20
@@ -276,7 +274,7 @@
             this.textBox20.Location = new System.Drawing.Point(3, 128);
             this.textBox20.Name = "textBox20";
             this.textBox20.Size = new System.Drawing.Size(94, 20);
-            this.textBox20.TabIndex = 188;
+            this.textBox20.TabIndex = 6;
             this.textBox20.Text = "0000.00";
             // 
             // textBox21
@@ -284,7 +282,7 @@
             this.textBox21.Location = new System.Drawing.Point(3, 103);
             this.textBox21.Name = "textBox21";
             this.textBox21.Size = new System.Drawing.Size(94, 20);
-            this.textBox21.TabIndex = 187;
+            this.textBox21.TabIndex = 5;
             this.textBox21.Text = "0000.00";
             // 
             // textBox28
@@ -292,7 +290,7 @@
             this.textBox28.Location = new System.Drawing.Point(3, 3);
             this.textBox28.Name = "textBox28";
             this.textBox28.Size = new System.Drawing.Size(94, 20);
-            this.textBox28.TabIndex = 183;
+            this.textBox28.TabIndex = 1;
             this.textBox28.Text = "0000.00";
             // 
             // textBox32
@@ -300,7 +298,7 @@
             this.textBox32.Location = new System.Drawing.Point(3, 53);
             this.textBox32.Name = "textBox32";
             this.textBox32.Size = new System.Drawing.Size(94, 20);
-            this.textBox32.TabIndex = 182;
+            this.textBox32.TabIndex = 3;
             this.textBox32.Text = "0000.00";
             // 
             // textBox33
@@ -308,7 +306,7 @@
             this.textBox33.Location = new System.Drawing.Point(3, 28);
             this.textBox33.Name = "textBox33";
             this.textBox33.Size = new System.Drawing.Size(94, 20);
-            this.textBox33.TabIndex = 181;
+            this.textBox33.TabIndex = 2;
             this.textBox33.Text = "0000.00";
             // 
             // label29
@@ -338,30 +336,12 @@
             this.label31.TabIndex = 214;
             this.label31.Text = "2 - All Electric";
             // 
-            // seasonBox
-            // 
-            this.seasonBox.FormattingEnabled = true;
-            this.seasonBox.Location = new System.Drawing.Point(124, 18);
-            this.seasonBox.Name = "seasonBox";
-            this.seasonBox.Size = new System.Drawing.Size(121, 21);
-            this.seasonBox.TabIndex = 217;
-            this.seasonBox.SelectedIndexChanged += new System.EventHandler(this.seasonBox_SelectionChangeCommitted);
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(43, 21);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(75, 13);
-            this.label9.TabIndex = 218;
-            this.label9.Text = "Season (S/W)";
-            // 
             // cancelBtn
             // 
             this.cancelBtn.Location = new System.Drawing.Point(258, 386);
             this.cancelBtn.Name = "cancelBtn";
             this.cancelBtn.Size = new System.Drawing.Size(128, 35);
-            this.cancelBtn.TabIndex = 224;
+            this.cancelBtn.TabIndex = 42;
             this.cancelBtn.Text = "Cancel";
             this.cancelBtn.UseVisualStyleBackColor = true;
             this.cancelBtn.Click += new System.EventHandler(this.cancelBtn_Click);
@@ -371,7 +351,7 @@
             this.saveBtn.Location = new System.Drawing.Point(124, 386);
             this.saveBtn.Name = "saveBtn";
             this.saveBtn.Size = new System.Drawing.Size(128, 35);
-            this.saveBtn.TabIndex = 225;
+            this.saveBtn.TabIndex = 41;
             this.saveBtn.Text = "Save";
             this.saveBtn.UseVisualStyleBackColor = true;
             this.saveBtn.Click += new System.EventHandler(this.saveBtn_Click);
@@ -639,7 +619,7 @@
             this.textBox37.Location = new System.Drawing.Point(3, 3);
             this.textBox37.Name = "textBox37";
             this.textBox37.Size = new System.Drawing.Size(94, 20);
-            this.textBox37.TabIndex = 183;
+            this.textBox37.TabIndex = 20;
             this.textBox37.Text = "0000.00";
             // 
             // textBox39
@@ -647,7 +627,7 @@
             this.textBox39.Location = new System.Drawing.Point(3, 28);
             this.textBox39.Name = "textBox39";
             this.textBox39.Size = new System.Drawing.Size(94, 20);
-            this.textBox39.TabIndex = 181;
+            this.textBox39.TabIndex = 21;
             this.textBox39.Text = "0000.00";
             // 
             // textBox40
@@ -655,7 +635,7 @@
             this.textBox40.Location = new System.Drawing.Point(3, 53);
             this.textBox40.Name = "textBox40";
             this.textBox40.Size = new System.Drawing.Size(94, 20);
-            this.textBox40.TabIndex = 182;
+            this.textBox40.TabIndex = 22;
             this.textBox40.Text = "0000.00";
             // 
             // textBox41
@@ -663,7 +643,7 @@
             this.textBox41.Location = new System.Drawing.Point(3, 78);
             this.textBox41.Name = "textBox41";
             this.textBox41.Size = new System.Drawing.Size(94, 20);
-            this.textBox41.TabIndex = 189;
+            this.textBox41.TabIndex = 23;
             this.textBox41.Text = "0000.00";
             // 
             // textBox42
@@ -671,7 +651,7 @@
             this.textBox42.Location = new System.Drawing.Point(3, 103);
             this.textBox42.Name = "textBox42";
             this.textBox42.Size = new System.Drawing.Size(94, 20);
-            this.textBox42.TabIndex = 187;
+            this.textBox42.TabIndex = 24;
             this.textBox42.Text = "0000.00";
             // 
             // textBox43
@@ -679,7 +659,7 @@
             this.textBox43.Location = new System.Drawing.Point(3, 128);
             this.textBox43.Name = "textBox43";
             this.textBox43.Size = new System.Drawing.Size(94, 20);
-            this.textBox43.TabIndex = 188;
+            this.textBox43.TabIndex = 25;
             this.textBox43.Text = "0000.00";
             // 
             // textBox44
@@ -687,7 +667,7 @@
             this.textBox44.Location = new System.Drawing.Point(3, 153);
             this.textBox44.Name = "textBox44";
             this.textBox44.Size = new System.Drawing.Size(94, 20);
-            this.textBox44.TabIndex = 195;
+            this.textBox44.TabIndex = 26;
             this.textBox44.Text = "0000.00";
             // 
             // textBox45
@@ -695,7 +675,7 @@
             this.textBox45.Location = new System.Drawing.Point(3, 178);
             this.textBox45.Name = "textBox45";
             this.textBox45.Size = new System.Drawing.Size(94, 20);
-            this.textBox45.TabIndex = 193;
+            this.textBox45.TabIndex = 27;
             this.textBox45.Text = "0000.00";
             // 
             // textBox46
@@ -703,7 +683,7 @@
             this.textBox46.Location = new System.Drawing.Point(3, 203);
             this.textBox46.Name = "textBox46";
             this.textBox46.Size = new System.Drawing.Size(94, 20);
-            this.textBox46.TabIndex = 194;
+            this.textBox46.TabIndex = 28;
             this.textBox46.Text = "0000.00";
             // 
             // textBox47
@@ -711,7 +691,7 @@
             this.textBox47.Location = new System.Drawing.Point(3, 228);
             this.textBox47.Name = "textBox47";
             this.textBox47.Size = new System.Drawing.Size(94, 20);
-            this.textBox47.TabIndex = 197;
+            this.textBox47.TabIndex = 29;
             this.textBox47.Text = "0000.00";
             // 
             // UtilityElectricity1
@@ -745,8 +725,6 @@
             this.Controls.Add(this.label42);
             this.Controls.Add(this.saveBtn);
             this.Controls.Add(this.cancelBtn);
-            this.Controls.Add(this.label9);
-            this.Controls.Add(this.seasonBox);
             this.Controls.Add(this.label29);
             this.Controls.Add(this.label30);
             this.Controls.Add(this.label31);
@@ -807,8 +785,6 @@
         private System.Windows.Forms.Label label29;
         private System.Windows.Forms.Label label30;
         private System.Windows.Forms.Label label31;
-        private System.Windows.Forms.ComboBox seasonBox;
-        private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button cancelBtn;
         private System.Windows.Forms.Button saveBtn;
         private System.Windows.Forms.Label label33;

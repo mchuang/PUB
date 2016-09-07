@@ -20,7 +20,7 @@ namespace PUB
 
         private void TenantInfo_Load(object sender, EventArgs e)
         {
-            DatabaseControl.populateComboBox(ref parkList, DatabaseControl.parkTable, "ParkName", "ParkID");
+            DatabaseControl.populateComboBox(ref parkList, DatabaseControl.parkTable, "ParkNumber", "ParkName", "ParkID", "1=1 ORDER BY ParkNumber ASC", new Object[] {});
             tenantList.Enabled = false;
             //DatabaseControl.populateComboBox(ref tenantList, DatabaseControl.spaceTable, "Name", "ParkSpaceID");
         }
@@ -66,8 +66,9 @@ namespace PUB
             String tenantName;
             if (tenantList.SelectedItem is CommonTools.Item) { tenantName = ((CommonTools.Item)tenantList.SelectedItem).Text; }
             else { tenantName = tenantList.Text; }
-
-            String[] values = {tenantName, emailLbl.Text, phoneOfficeLbl.Text, phoneHomeLbl.Text, phoneMobileLbl.Text,
+            //String[] values = {tenantName, emailLbl.Text, phoneOfficeLbl.Text, phoneHomeLbl.Text, phoneMobileLbl.Text,
+            
+            String[] values = {nameLbl.Text, emailLbl.Text, phoneOfficeLbl.Text, phoneHomeLbl.Text, phoneMobileLbl.Text,
                 addrLbl0.Text, addrLbl1.Text, cityLbl.Text, stateLbl.Text, zipLbl.Text,
                 billAddrLbl0.Text, billAddrLbl0.Text, billCityLbl.Text, billStateLbl.Text, billZipLbl.Text};
             String[] fields = { "Tenant", "Email", "PhoneOffice", "PhoneHome", "PhoneCellular", "Address1", "Address2", "City", "State", "Zip",
@@ -93,8 +94,27 @@ namespace PUB
         private void parkList_SelectedIndexChanged(object sender, EventArgs e)
         {
             int parkID = ((CommonTools.Item)parkList.SelectedItem).Value;
+            tenantList.Items.Clear();
+            tenantList.Text = "";
+            nameLbl.Text = "";
+            emailLbl.Text = "";
+            phoneOfficeLbl.Text = "";
+            phoneHomeLbl.Text = "";
+            phoneMobileLbl.Text = "";
+            addrLbl0.Text = "";
+            addrLbl1.Text = "";
+            cityLbl.Text = "";
+            stateLbl.Text = "";
+            zipLbl.Text = "";
+            billAddrLbl0.Text = "";
+            billAddrLbl1.Text = "";
+            billCityLbl.Text = "";
+            billStateLbl.Text = "";
+            billZipLbl.Text = "";
+            sameAsStreet.Checked = false;
             tenantList.Enabled = true;
-            DatabaseControl.populateComboBox(ref tenantList, DatabaseControl.spaceTable, "ParkSpaceID", "SpaceID", "Tenant", "ParkID=@value0", new Object[] { parkID });
+            DatabaseControl.populateComboBox(ref tenantList, DatabaseControl.spaceTable, "OrderID", "Tenant", "ParkSpaceID",
+                "ParkID=@value0 and MoveOutDate IS NULL ORDER BY OrderID ASC", new Object[] { parkID });
         }
     }
 }

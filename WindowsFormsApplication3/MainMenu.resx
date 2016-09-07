@@ -120,4 +120,38 @@
   <metadata name="menuStrip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
+  <data name="richTextBox1.Text" xml:space="preserve">
+    <value>User Hot Keys:
+  Reset Password      Alt + R
+  Owner               Alt + O
+  Park                Alt + P
+  Space               Alt + S
+  Tenant              Alt + T
+  Import MeterReads   Alt + M
+  Export MeterReads   Alt + X
+  Bill                Alt + B
+Admin Hot Keys:
+  Add User            Alt + A
+  Disable User        Alt + D
+  Tier                Alt + I
+  Gas Company         Alt + G
+  Ele Company         Alt + E
+  Wat Company         Alt + W
+
+  
+</value>
+  </data>
+  <data name="richTextBox2.Text" xml:space="preserve">
+    <value>User Notes:
+  -Create Park Reports (Total Listings, Utility, etc) in Bill
+  -Edit individual tenant meter reads under the History button found on Billing
+  -History button can be used to adjust readings for closing
+  -Generated Bills, CSV Files,and Reports can be found in folders
+  -Click Display Rates on Utility Companies to see current list of rates
+  -Surcharges for Electricity can be categorized as Delivery, Generation, or Regular
+  -Click the Store button to temporarily save the edited rates and Commit to finalize data to the database
+  -Parks, tenants, spaces, and utility rates can be changed under the Edit menu
+  
+</value>
+  </data>
 </root>
